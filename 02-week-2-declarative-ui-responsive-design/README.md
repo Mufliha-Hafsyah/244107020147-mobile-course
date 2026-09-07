@@ -39,7 +39,7 @@ Sebaliknya, dengan `Expanded`, `Row` membatasi lebar `Column` sesuai sisa ruang 
 Hal ini menunjukkan pentingnya `MainAxisSize.min` ketika kita ingin sebuah container/kartu membungkus rapat kontennya, bukan ikut memenuhi ruang parent yang jauh lebih besar.
 
 #### Eksperimen 3 — Menambahkan Baris Data (Email)
-![Tambah Email](screenshots/praktikum4-tambah-email.png)<br>
+![Tambah Email](screenshots/praktikum4-tambah-email.jpeg)<br>
 
 **Analisis:**<br>
 Pola `Row` + `Expanded` bersifat reusable, menambah baris data baru cukup dengan menduplikasi struktur yang sama tanpa mengubah bagian lain. Tinggi kartu bertambah otomatis mengikuti jumlah konten karena `MainAxisSize.min` masih aktif.
