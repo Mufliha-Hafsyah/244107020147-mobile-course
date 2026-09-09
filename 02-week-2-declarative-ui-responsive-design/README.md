@@ -192,6 +192,62 @@ SingleChildScrollView(
 ![Academic Overview](screenshots/tugas-utama-landscape2.png)<br>
 Screenshot di atas membuktikan bahwa keputusan akhir (tetap pakai `GridView.count` dengan breakpoint `700px`, sesuai hasil diskusi Prompt 1) sudah diuji nyata: 1 kolom pada layar sempit, 2 kolom pada layar lebar, bukan sekadar klaim teori dari AI. 
 
+---
+#### Refactoring challenge
+**Hasil Refactoring:**
+![Refactoring challenge](screenshots/refactoring.png)<br>
 
+Setelah Tugas Utama berjalan, dilakukan pembersihan kode dengan 3 penyesuaian:
 
+1. **Ekstrak widget reusable** 
+- `DashboardCard` di-rename menjadi `InfoCard` agar konsisten dengan istilah pada modul. Widget ini menerima `title` dan `value`, dan sudah dipakai berulang di `GridView` tanpa duplikasi struktur widget.
+2. **Warna mengikuti tema** 
+- seluruh warna (background `ProfileHeader`, tema aplikasi) menggunakan `Theme.of(context).colorScheme...` atau `colorSchemeSeed`, tidak ada warna hardcode yang mengabaikan light/dark theme.
+3. **Breakpoint dipindah ke konstanta bernama:**
+```dart
+   const kWideBreakpoint = 700;
+```
+<br>digunakan pada `LayoutBuilder`:
 
+```dart
+   final columns = constraints.maxWidth >= kWideBreakpoint ? 2 : 1;
+```
+<br>sehingga breakpoint hanya didefinisikan satu kali dan mudah diubah di masa depan.
+
+4. **`flutter analyze`** dijalankan setelah refactor 
+![Flutter analyze](screenshots/analyze.png)<br>
+- hasil **No issues found!**, tidak ada error maupun warning baru. Tampilan aplikasi diverifikasi identik dengan sebelum refactor (perilaku tidak berubah, hanya struktur kode yang lebih rapi).
+---
+#### Testing dasar
+**Hasil pengujian:**
+![Flutter Test Passed](screenshots/test.png)<br>
+
+Kedua test lulus (`All tests passed!`), membuktikan bahwa lebar `Card` di layar sempit (400px) selalu kurang dari 700px, dan di layar lebar (1200px) selalu lebih dari 500px, sesuai perilaku responsif yang diharapkan.
+---
+#### Checklist verifikasi
+1. flutter analyze tidak menghasilkan error.
+bukti *screenshot* : <br>
+![Flutter analyze](screenshots/analyze.png)<br>
+2. flutter test lulus semua widget test responsif.
+bukti *screenshot* : <br>
+![Flutter Test Passed](screenshots/test.png)<br>
+3. Aplikasi dapat dijalankan pada ukuran layar sempit dan lebar.
+bukti *screenshot* : <br>
+- Layar Sempit (Potrait) 
+![Academic Overview](screenshots/tugas-utama-potrait.png)<br>
+- Layar Lebar (Landscape)
+![Academic Overview](screenshots/tugas-utama-landscape1.png)<br>
+![Academic Overview](screenshots/tugas-utama-landscape2.png)<br>
+4. Dark mode memiliki kontras dan teks yang terbaca.
+bukti *screenshot* : <br>
+![Toggle Dark](screenshots/praktikum5-toggle-dark.png)<br>
+5. Struktur widget dapat dijelaskan saat code review.
+Struktur widget pada project ini:
+- `DashboardApp` (`StatefulWidget`): root aplikasi, menyimpan state `isDark` dan mengatur `themeMode`.
+- `DashboardPage`: berisi `AppBar` (dengan toggle `CupertinoSwitch`) dan `LayoutBuilder` untuk grid responsif.
+- `ProfileHeader`: kartu profil di bagian atas dashboard.
+- `InfoCard`: widget reusable untuk tiap kartu informasi (`title` + `value`), dipakai 4 kali di dalam `GridView.count`.
+6. Screenshot, folder test/, dan README sudah tersimpan pada folder tugas Week 2.
+bukti *screenshot* : <br>
+![struktur folder](screenshots/struktur-folder-screenshots.png)<br>
+![struktur folder](screenshots/struktur-folder-test.png)<br>
