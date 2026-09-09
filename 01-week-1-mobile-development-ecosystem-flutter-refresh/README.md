@@ -10,8 +10,7 @@
 
 ---
 
-## JOBSHEET WEEK 1
-**Mobile Development Ecosystem & Flutter Refresh**
+## JOBSHEET WEEK 1 Mobile Development Ecosystem & Flutter Refresh
 
 ### Hasil Praktikum
 
