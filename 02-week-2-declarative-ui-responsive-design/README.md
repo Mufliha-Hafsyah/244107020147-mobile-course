@@ -71,7 +71,7 @@ Menampilkan 2 kolom sejajar, sesuai breakpoint `700px`.<br>
 ![Toggle Light](screenshots/praktikum5-toggle-light.png)<br>
 ![Toggle Dark](screenshots/praktikum5-toggle-dark.png)<br>
 `CupertinoSwitch` berhasil mengubah tema aplikasi secara manual, terlepas dari setting sistem. Berbeda dengan praktikum sebelumnya yang mengikuti `ThemeMode.system`.
-
+---
 ### Eksperimen Layout
 #### Eksperimen 1 - Ubah breakpoint dari 700 menjadi nilai lain dan amati perubahan jumlah kolom.
 Breakpoint diturunkan dari `700` ke `350`<br>
@@ -219,9 +219,8 @@ Setelah Tugas Utama berjalan, dilakukan pembersihan kode dengan 3 penyesuaian:
 - hasil **No issues found!**, tidak ada error maupun warning baru. Tampilan aplikasi diverifikasi identik dengan sebelum refactor (perilaku tidak berubah, hanya struktur kode yang lebih rapi).
 ---
 #### Testing dasar
-**Hasil pengujian:**
+Hasil pengujian:<br>
 ![Flutter Test Passed](screenshots/test.png)<br>
-
 Kedua test lulus (`All tests passed!`), membuktikan bahwa lebar `Card` di layar sempit (400px) selalu kurang dari 700px, dan di layar lebar (1200px) selalu lebih dari 500px, sesuai perilaku responsif yang diharapkan.
 ---
 #### Checklist verifikasi
@@ -251,3 +250,26 @@ Struktur widget pada project ini:
 bukti *screenshot* : <br>
 ![struktur folder](screenshots/struktur-folder-screenshots.png)<br>
 ![struktur folder](screenshots/struktur-folder-test.png)<br>
+---
+### Refleksi
+1. **Apa perbedaan cara berpikir imperative dan declarative saat membangun UI?**<br>
+Jawaban:<br>
+Dalam pendekatan imperative, kita harus menulis langkah demi langkah bagaimana UI berubah, misalnya "cari elemen ini, lalu ubah warnanya, lalu update tampilannya". Sedangkan dalam declarative (seperti Flutter), kita cukup mendeskripsikan *seperti apa* UI seharusnya terlihat berdasarkan state saat ini, dan framework yang mengurus bagaimana cara mengubah tampilannya. Ini terasa jelas saat membuat `CupertinoSwitch` untuk toggle dark mode, saya tidak perlu menulis kode untuk "mengubah warna background secara manual", cukup ubah state `isDark` lewat `setState`, dan seluruh `build()` otomatis dipanggil ulang dengan `themeMode` yang sesuai.
+2. **Kapan Expanded membantu dan kapan penggunaannya justru menghasilkan layout error?**<br>
+Jawaban:<br>
+- `Expanded` membantu ketika kita ingin sebuah widget mengisi sisa ruang yang tersedia di dalam `Row`/`Column`, sekaligus mencegah overflow karena `Expanded` memberi batas lebar/tinggi yang jelas ke child-nya. Saya membuktikan ini langsung di Praktikum 4: tanpa `Expanded`, nama yang panjang menyebabkan overflow (garis kuning-hitam), sedangkan dengan `Expanded`, teks otomatis wrap ke baris berikutnya karena mendapat batas lebar yang jelas.
+- Namun `Expanded` justru menyebabkan error jika diletakkan di dalam widget yang memberi ruang tak terbatas (unbounded), misalnya `Row` di dalam `SingleChildScrollView` dengan `scrollDirection: Axis.horizontal`. Dalam kasus ini, `Expanded` tidak tahu harus membagi ruang seberapa besar, sehingga Flutter melempar error "RenderFlex children have non-zero flex but incoming width constraints are unbounded".
+
+3. **Bagaimana breakpoint dan theme memengaruhi pengalaman pengguna?**<br>
+Jawaban:<br>
+- Breakpoint menentukan kapan layout berubah struktur (1 kolom vs 2 kolom) berdasarkan lebar layar. Breakpoint yang tepat (misalnya 700px pada dashboard ini) memastikan tampilan tetap nyaman dibaca di HP maupun tablet. Saya mencoba menurunkan breakpoint ke 350px sebagai eksperimen, dan hasilnya kartu menjadi terlalu sempit meski masih di layar HP. Hal ini menunjukkan breakpoint yang tidak sesuai target device bisa merusak pengalaman membaca, meskipun secara teknis kode tetap "responsif".
+- Sementara itu, theme (light/dark) memengaruhi kenyamanan visual, terutama kontras teks terhadap background dan konsistensi warna di seluruh aplikasi. Karena warna diambil dari `Theme.of(context).colorScheme`, transisi antara light dan dark mode tetap konsisten tanpa perlu mengatur ulang warna di tiap widget secara manual.
+
+4. **Apa yang Anda verifikasi dari rekomendasi AI setelah tugas inti selesai?**<br>
+Jawaban:<br>
+Setelah mendapat rekomendasi AI soal perbandingan `GridView` vs `LayoutBuilder`+`Column` manual, dan solusi untuk masalah `Expanded` di dalam scroll horizontal, saya memverifikasi tiga hal: 
+- apakah rekomendasi tetap responsif di layar sempit (di bawah 600px) dengan mengecek langsung lewat screenshot potret HP
+- apakah rekomendasi tersebut mengurangi aksesibilitas yang sudah saya bangun lewat `Semantics`
+- apakah semua widget yang disebutkan AI benar-benar tersedia di Flutter versi stable, bukan API eksperimental. <br>
+Dari verifikasi ini, saya menemukan satu rekomendasi awal AI (`SizedBox` fixed-width) kurang tepat untuk layar sangat sempit, sehingga saya revisi menjadi `Flexible` + `ConstrainedBox` yang lebih adaptif, ini menegaskan bahwa saran AI tetap perlu diuji ulang terhadap kondisi nyata proyek, bukan diterima mentah-mentah.
+---
