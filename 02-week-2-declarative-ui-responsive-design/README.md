@@ -217,12 +217,17 @@ Setelah Tugas Utama berjalan, dilakukan pembersihan kode dengan 3 penyesuaian:
 4. **`flutter analyze`** dijalankan setelah refactor 
 ![Flutter analyze](screenshots/analyze.png)<br>
 - hasil **No issues found!**, tidak ada error maupun warning baru. Tampilan aplikasi diverifikasi identik dengan sebelum refactor (perilaku tidak berubah, hanya struktur kode yang lebih rapi).
+
 ---
+
 #### Testing dasar
+
 Hasil pengujian:<br>
 ![Flutter Test Passed](screenshots/test.png)<br>
 Kedua test lulus (`All tests passed!`), membuktikan bahwa lebar `Card` di layar sempit (400px) selalu kurang dari 700px, dan di layar lebar (1200px) selalu lebih dari 500px, sesuai perilaku responsif yang diharapkan.
+
 ---
+
 #### Checklist verifikasi
 1. flutter analyze tidak menghasilkan error.
 bukti *screenshot* : <br>
