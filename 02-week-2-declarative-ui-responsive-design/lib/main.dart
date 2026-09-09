@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
+const kWideBreakpoint = 700;
+
 void main() => runApp(const DashboardApp());
 
 class DashboardApp extends StatefulWidget {
@@ -62,19 +64,28 @@ class DashboardPage extends StatelessWidget {
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
-          final columns = constraints.maxWidth >= 700 ? 2 : 1;
-          return GridView.count(
+          final columns = constraints.maxWidth >= kWideBreakpoint ? 2 : 1;
+           return Padding(
             padding: const EdgeInsets.all(16),
-            crossAxisCount: columns,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 2.6,
-            children: const [
-              DashboardCard(title: 'Assignments', value: '8'),
-              DashboardCard(title: 'Attendance', value: '92%'),
-              DashboardCard(title: 'Portfolio', value: 'Ready'),
-              DashboardCard(title: 'Current week', value: '02'),
-            ],
+            child: Column(
+              children: [
+                const ProfileHeader(),
+                Expanded(
+                  child: GridView.count(
+                    crossAxisCount: columns,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 2.6,
+                    children: const [
+                      InfoCard(title: 'Assignments', value: '8'),
+                      InfoCard(title: 'Attendance', value: '92%'),
+                      InfoCard(title: 'Portfolio', value: 'Ready'),
+                      InfoCard(title: 'Current week', value: '02'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           );
         },
       ),
@@ -82,8 +93,8 @@ class DashboardPage extends StatelessWidget {
   }
 }
 
-class DashboardCard extends StatelessWidget {
-  const DashboardCard({required this.title, required this.value, super.key});
+class InfoCard extends StatelessWidget {
+  const InfoCard({required this.title, required this.value, super.key});
   final String title;
   final String value;
 
@@ -98,6 +109,44 @@ class DashboardCard extends StatelessWidget {
             Expanded(child: Text(title)),
             Text(value, style: Theme.of(context).textTheme.headlineSmall),
           ]),
+        ),
+      ),
+    );
+  }
+}
+
+class ProfileHeader extends StatelessWidget {
+  const ProfileHeader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: 'Profil mahasiswa: Mufliha Hafsyah Shahieza, NIM 244107020147, Kelas TI-3G',
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.primaryContainer,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            const CircleAvatar(radius: 28, child: Icon(Icons.person, size: 32)),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Mufliha Hafsyah Shahieza',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                  Text('NIM   : 244107020147'),
+                  Text('Kelas : TI-3G'),
+                  Text('Email : muflihahafsyah@gmail.com'),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

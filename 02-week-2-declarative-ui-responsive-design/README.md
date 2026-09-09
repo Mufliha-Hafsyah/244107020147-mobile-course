@@ -102,8 +102,95 @@ Grid berubah menjadi 2 kolom bahkan pada layar HP potret. Ini menunjukkan breakp
 - `Semantics` penting untuk aksesibilitas meski tidak berdampak visual, karena memberi konteks yang jelas bagi pengguna screen reader.
 
 ---
+### Tugas dan AI design exploration
+#### Tugas Utama Academic Overview
+- Layar Sempit (Potrait) 
+![Academic Overview](screenshots/tugas-utama-potrait.png)<br>
+- Layar Lebar (Landscape)
+![Academic Overview](screenshots/tugas-utama-landscape1.png)<br>
+![Academic Overview](screenshots/tugas-utama-landscape2.png)<br>
 
+---
+#### AI Prompt Challenge
+##### Prompt 1 — Prompt Desain
 
+**Prompt yang diajukan:**
+> "Bandingkan dua tata letak dashboard akademik untuk Flutter: versi `GridView` dan versi `LayoutBuilder` + `Column`. Jelaskan trade-off responsif dan aksesibilitasnya."
+
+**Ringkasan output AI:**<br>
+1. GridView:
+- Kelebihan: otomatis scrollable kalau konten melebihi layar, crossAxisCount gampang diubah dinamis untuk kolom responsif, cocok untuk data seragam (kartu dengan bentuk/ukuran mirip).
+- Trade-off: childAspectRatio itu tetap/fixed, jadi kalau konten salah satu kartu lebih panjang dari yang lain, bisa overflow atau keliatan aneh (ada ruang kosong berlebih). Untuk aksesibilitas, urutan fokus (Semantics) mengikuti urutan grid row-by-row, kadang kurang natural untuk screen reader dibanding susunan linear.
+2. LayoutBuilder + Column:
+- Kelebihan: lebih fleksibel mengatur ukuran tiap item secara individual (tidak harus seragam), transisi fokus untuk screen reader lebih predictable karena urutannya eksplisit sesuai kode.
+- Trade-off: harus manual coding logic wrap ke baris baru sendiri (Wrap widget atau bikin Row bersarang dengan pengecekan index), lebih banyak boilerplate dibanding GridView yang sudah built-in grid logic-nya.
+<br>
+
+- **Keputusan yang dipilih:** Tetap menggunakan `GridView.count` seperti pada implementasi awal, karena kartu dashboard (`Assignments`, `Attendance`, `Portfolio`, `Current week`) berukuran seragam. Kelebihan `GridView` (built-in grid logic, scrollable otomatis) lebih relevan dibanding kebutuhan fleksibilitas ukuran item dari pendekatan manual.
+- **Alasan teknis:** Konten dashboard bersifat homogen (semua kartu punya struktur `title` + `value` yang sama), sehingga trade-off `GridView` (aspect ratio tetap) tidak menjadi masalah nyata di kasus ini.
+
+---
+##### Prompt 2 — Prompt Penguatan Konsep
+
+**Prompt yang diajukan:**
+> "Jelaskan kapan penggunaan `Expanded` justru menyebabkan overflow di dalam `Row`, beri contoh kode yang gagal dan perbaikannya."
+
+**Ringkasan output AI:**<br> 
+- Expanded sebenarnya dirancang untuk mencegah overflow, bukan menyebabkannya. Tapi ada 1 skenario umum di mana Expanded justru bikin error, yaitu menggunakan lebih dari satu Expanded dengan total flex yang membutuhkan ruang lebih besar dari yang tersedia, dikombinasikan dengan child yang punya ukuran minimum tetap (misal Image dengan width fixed) di dalam Expanded itu sendiri. Hal ini menyebabkan "RenderFlex children have non-zero flex but incoming width constraints are unbounded", biasanya terjadi kalau Row itu sendiri diletakkan di dalam widget lain yang tidak memberi batas lebar (misal di dalam ListView horizontal atau SingleChildScrollView horizontal tanpa constraint).
+- Contoh kode yang gagal: 
+```dart
+SingleChildScrollView(
+  scrollDirection: Axis.horizontal,
+  child: Row(
+    children: [
+      Expanded(child: Text('Item 1')), // ERROR: Expanded butuh bounded width
+    ],
+  ),
+)
+```
+<br>
+Error ini muncul karena SingleChildScrollView horizontal memberi lebar unbounded (tak terbatas) ke child-nya, sedangkan Expanded butuh tahu batas lebar yang jelas untuk membagi ruang.
+
+- Perbaikan dilakukan dengan mengganti Expanded dengan lebar tetap, atau hilangkan scroll horizontal kalau tidak perlu:
+```dart
+SingleChildScrollView(
+  scrollDirection: Axis.horizontal,
+  child: Row(
+    children: [
+      SizedBox(width: 200, child: Text('Item 1')), // aman, lebar eksplisit
+    ],
+  ),
+)
+```
+<br>
+
+- **Keputusan yang dipilih:** Tidak diterapkan langsung ke project (karena dashboard kita tidak menggunakan `Row` di dalam scroll horizontal), namun dicatat sebagai referensi konsep. Jika suatu saat dibutuhkan, solusi yang lebih tepat adalah `Flexible` + `ConstrainedBox(maxWidth: ...)`, bukan `SizedBox` fixed-width, agar tetap adaptif di layar sempit.
+- **Alasan teknis:** `Flexible` tidak memaksa child mengambil ruang penuh seperti `Expanded`, dan `ConstrainedBox` memberi batas maksimum tanpa memaksa lebar minimum, kombinasi ini lebih aman untuk berbagai ukuran layar dibanding lebar tetap (hardcoded).
+
+---
+##### Prompt 3 — Verification Prompt 
+
+**Prompt yang diajukan:**
+> "Periksa kembali rekomendasi layout di atas: apakah tetap responsif di bawah 600px, apakah mengurangi aksesibilitas, dan apakah ada widget yang tidak tersedia di Flutter stabil saat ini?"
+
+**Hasil audit:**<br>
+1. **Responsif di bawah 600px?** 
+- Rekomendasi GridView di Prompt 1: ya, tetap responsif. breakpoint kita (700px) sudah menghasilkan 1 kolom di bawah 600px, dan childAspectRatio: 2.6 masih proporsional untuk lebar HP standar (~360-430px).
+- Solusi Prompt 2 (SizedBox(width: 200, ...) untuk mengganti Expanded): ini berpotensi masalah di layar sangat sempit (<400px) karena lebar tetap 200px bisa jadi proporsi terlalu besar dari total lebar layar. Perbaikan yang lebih aman: pakai ConstrainedBox(constraints: BoxConstraints(maxWidth: 200)) dengan Flexible (bukan Expanded), supaya tetap bisa mengecil di layar sempit tanpa error unbounded width.
+<br>
+
+2. **Mengurangi aksesibilitas?** 
+- Tidak ada rekomendasi yang mengurangi atau menghapus `Semantics` yang sudah diterapkan pada `DashboardCard` dan `CupertinoSwitch`.
+<br>
+
+3. **Apakah ada widget yang tidak tersedia di Flutter stabil saat ini?** 
+- Semua widget yang direkomendasikan (`GridView`, `LayoutBuilder`, `Expanded`, `Flexible`, `ConstrainedBox`, `SizedBox`) adalah widget inti Flutter stable, tidak ada yang eksperimental atau deprecated.
+
+**Bukti verifikasi:** 
+![Academic Overview](screenshots/tugas-utama-potrait.png)<br>
+![Academic Overview](screenshots/tugas-utama-landscape1.png)<br>
+![Academic Overview](screenshots/tugas-utama-landscape2.png)<br>
+Screenshot di atas membuktikan bahwa keputusan akhir (tetap pakai `GridView.count` dengan breakpoint `700px`, sesuai hasil diskusi Prompt 1) sudah diuji nyata: 1 kolom pada layar sempit, 2 kolom pada layar lebar, bukan sekadar klaim teori dari AI. 
 
 
 
