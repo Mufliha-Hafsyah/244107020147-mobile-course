@@ -37,6 +37,8 @@ Saat item ditekan, path berpindah dari `/` ke `/detail/:id` sesuai id item yang 
 ![Delete](screenshots/praktikum2-todo-deleted.png)<br>
 
 **Analisis:**<br>
-`ref.watch` di dalam `build` membuat `TodoPage` otomatis rebuild setiap kali `state` di `TodoListNotifier` berubah (nambah, toggle, atau hapus tugas), ini konsekuensi dari prinsip *UI deklaratif = f(state)*. Sebaliknya, `ref.read` di dalam callback (`onPressed`, `onChanged`) hanya memanggil method notifier satu kali tanpa ikut "berlangganan" perubahan, sehingga tidak menyebabkan rebuild berulang yang tidak perlu.
+- `ref.watch` yang dipanggil di dalam `build` menyebabkan `TodoPage` melakukan pembangunan ulang (rebuild) secara otomatis setiap kali `state` pada `TodoListNotifier` mengalami perubahan, baik akibat penambahan, pengubahan status (toggle), maupun penghapusan tugas. Hal ini merupakan konsekuensi dari prinsip *UI deklaratif = f(state)*, di mana tampilan antarmuka selalu merepresentasikan state terkini secara konsisten.
+- Sebaliknya, `ref.read` yang digunakan di dalam callback (`onPressed`, `onChanged`) hanya melakukan pemanggilan method notifier satu kali tanpa mendaftarkan widget untuk menerima notifikasi perubahan state selanjutnya. Pendekatan ini mencegah terjadinya pembangunan ulang widget yang tidak diperlukan pada saat callback dieksekusi.
+- Poin penting yang telah diverifikasi adalah bahwa seluruh method pada `TodoListNotifier` (`add`, `toggle`, `remove`) senantiasa menghasilkan objek atau list yang baru (`[...state, ...]`, `copyWith`, `[...state]..removeAt(...)`), bukan memodifikasi `state` secara langsung. Hal ini bersifat krusial karena Riverpod mendeteksi perubahan berdasarkan perbedaan referensi objek, bukan berdasarkan mutasi internal pada objek yang sama.
 
 ---
