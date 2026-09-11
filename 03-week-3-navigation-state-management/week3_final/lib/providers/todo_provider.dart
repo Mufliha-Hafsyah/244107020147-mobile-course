@@ -29,5 +29,22 @@ final todoListProvider =
 
 final incompleteTodosProvider = Provider<List<Todo>>((ref) {
   final todos = ref.watch(todoListProvider);
-  return todos.where((todo) => !todo.done).toList();
+  final showOnlyIncomplete = ref.watch(showOnlyIncompleteProvider);
+  if (showOnlyIncomplete) {
+    return todos.where((todo) => !todo.done).toList();
+  }
+  return todos;
 });
+
+class ShowOnlyIncompleteNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void toggle() {
+    state = !state;
+  }
+}
+
+final showOnlyIncompleteProvider =
+    NotifierProvider<ShowOnlyIncompleteNotifier, bool>(
+        ShowOnlyIncompleteNotifier.new);

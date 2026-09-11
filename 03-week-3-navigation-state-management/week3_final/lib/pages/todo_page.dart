@@ -8,10 +8,24 @@ class TodoPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final todos = ref.watch(todoListProvider);
+    final todos = ref.watch(incompleteTodosProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('ToDo Riverpod')),
+      appBar: AppBar(
+        title: const Text('ToDo Riverpod'),
+        actions: [
+          IconButton(
+            icon: Icon(
+              ref.watch(showOnlyIncompleteProvider)
+                  ? Icons.filter_alt
+                  : Icons.filter_alt_outlined,
+            ),
+            tooltip: 'Tampilkan belum selesai saja',
+            onPressed: () =>
+                ref.read(showOnlyIncompleteProvider.notifier).toggle(),
+          ),
+        ],
+      ),
       body: todos.isEmpty
           ? const Center(child: Text('Belum ada tugas'))
           : ListView.builder(
