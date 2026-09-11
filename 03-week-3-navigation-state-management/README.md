@@ -30,7 +30,7 @@ Saat item ditekan, path berpindah dari `/` ke `/detail/:id` sesuai id item yang 
 **Dialog tambah tugas:**<br>
 ![Dialog Tambah](screenshots/praktikum2-todo-dialog-tambah.png)<br><br>
 **List terisi:**<br>
-![List](screenshots/praktikum2-todo-list.png)<br>
+![List](screenshots/praktikum2-todo-list.png)<br><br>
 **Tugas dicentang (selesai):**<br>
 ![Checked](screenshots/praktikum2-todo-checked.png)<br><br>
 **Tugas dihapus:**
@@ -59,7 +59,7 @@ Jawaban:<br>
 
 ---
 
-## AI Prompt Challenge
+### AI Challenge
 
 Dokumentasi lengkap proses AI Prompt Challenge dapat dilihat di:<br>
 
@@ -70,3 +70,4 @@ AI digunakan untuk membuat `StatsPage` dengan `AsyncNotifierProvider` sesuai pro
 
 --- 
 
+### Refactoring  
