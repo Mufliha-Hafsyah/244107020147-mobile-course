@@ -14,8 +14,8 @@
 
 ---
 ### Praktikum 1 — Aplikasi Multi-page dengan GoRouter
-![Flutter Pub](screenshots/praktikum1-flutterpub.png)<br>
-![Home](screenshots/praktikum1-home.png)<br>
+![Flutter Pub](screenshots/praktikum1-flutterpub.png)<br><br>
+![Home](screenshots/praktikum1-home.png)<br><br>
 ![Detail](screenshots/praktikum1-detail.png)<br>
 
 **Analisis:**<br>
@@ -26,15 +26,15 @@ Saat item ditekan, path berpindah dari `/` ke `/detail/:id` sesuai id item yang 
 ### Praktikum  2 — Aplikasi ToDo dengan Riverpod
 
 **Kondisi awal (kosong):**<br>
-![Kosong](screenshots/praktikum2-todo-kosong.png)<br>
+![Kosong](screenshots/praktikum2-todo-kosong.png)<br><br>
 **Dialog tambah tugas:**<br>
-![Dialog Tambah](screenshots/praktikum2-todo-dialog-tambah.png)<br>
+![Dialog Tambah](screenshots/praktikum2-todo-dialog-tambah.png)<br><br>
 **List terisi:**<br>
 ![List](screenshots/praktikum2-todo-list.png)<br>
 **Tugas dicentang (selesai):**<br>
-![Checked](screenshots/praktikum2-todo-checked.png)<br>
+![Checked](screenshots/praktikum2-todo-checked.png)<br><br>
 **Tugas dihapus:**
-![Delete](screenshots/praktikum2-todo-deleted.png)<br>
+![Delete](screenshots/praktikum2-todo-deleted.png)<br><br>
 
 **Analisis:**<br>
 - `ref.watch` yang dipanggil di dalam `build` menyebabkan `TodoPage` melakukan pembangunan ulang (rebuild) secara otomatis setiap kali `state` pada `TodoListNotifier` mengalami perubahan, baik akibat penambahan, pengubahan status (toggle), maupun penghapusan tugas. Hal ini merupakan konsekuensi dari prinsip *UI deklaratif = f(state)*, di mana tampilan antarmuka selalu merepresentasikan state terkini secara konsisten.
@@ -58,3 +58,15 @@ Jawaban:<br>
 - Menampilkan data lama (*stale data*) sambil memberi indikator refresh membuat pengguna tetap mengetahui bahwa aplikasi sedang bekerja (loading), bukan mengalami macet atau lag. Data lama tetap terlihat di layar sehingga pengguna tidak merasa kebingungan karena layar tiba-tiba kosong, dan mereka dapat menunggu dengan tenang sampai data baru selesai dimuat, sambil tetap dapat melihat atau menggunakan data lama untuk sementara waktu. Pola ini penting terutama pada aplikasi yang sering melakukan proses refresh (misalnya *pull-to-refresh* pada daftar produk atau notifikasi), karena mengosongkan layar setiap kali refresh dilakukan akan terasa mengganggu dan membuat pengalaman pengguna terasa tidak stabil.
 
 ---
+
+## AI Prompt Challenge
+
+Dokumentasi lengkap proses AI Prompt Challenge dapat dilihat di:<br>
+
+📄 [docs/ai-verification.md](docs/ai-verification.md)<br>
+
+**Ringkasan:**<br> 
+AI digunakan untuk membuat `StatsPage` dengan `AsyncNotifierProvider` sesuai prompt pada modul. Setelah diverifikasi menggunakan AI Verification Checklist, ditemukan bahwa kode AI secara struktural sudah benar (immutability, pola `ref.watch`/`ref.read`, penanganan tiga state `AsyncValue`), namun unit test yang diberikan bersifat *flaky* (tidak deterministik) dan mengalami race condition saat pengujian skenario error. Diperlukan tiga iterasi perbaikan sebelum kode benar-benar lolos `flutter analyze` dan `flutter test` tanpa masalah.
+
+--- 
+
