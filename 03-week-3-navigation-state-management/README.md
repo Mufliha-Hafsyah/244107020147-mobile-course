@@ -42,3 +42,19 @@ Saat item ditekan, path berpindah dari `/` ke `/detail/:id` sesuai id item yang 
 - Poin penting yang telah diverifikasi adalah bahwa seluruh method pada `TodoListNotifier` (`add`, `toggle`, `remove`) senantiasa menghasilkan objek atau list yang baru (`[...state, ...]`, `copyWith`, `[...state]..removeAt(...)`), bukan memodifikasi `state` secara langsung. Hal ini bersifat krusial karena Riverpod mendeteksi perubahan berdasarkan perbedaan referensi objek, bukan berdasarkan mutasi internal pada objek yang sama.
 
 ---
+### Praktikum  3 — Menangani State Asinkron dengan AsyncValue
+**Tampilan loading selama 2 detik pertama:**<br>
+![Loading](screenshots/praktikum3-loading.png)<br><br>
+**Tampilan sukses:**<br>
+![Success](screenshots/praktikum3-success.png)<br><br>
+**Tampilan error beserta tombol Coba lagi:**<br>
+![Error](screenshots/praktikum3-error.png)<br><br>
+
+**Analisis:**<br>
+- `AsyncValue` memodelkan ketiga kemungkinan state (loading, error, success) dalam satu tipe data, sehingga UI cukup menggunakan satu method `.when()` untuk menentukan tampilan yang sesuai, tanpa perlu mengelola beberapa flag boolean (`isLoading`, `hasError`) secara manual yang berisiko menghasilkan kombinasi kondisi yang tidak konsisten.<br><br>
+
+**Refleksikan: mengapa menampilkan ulang data lama (stale data) dengan indikator refresh kadang lebih baik daripada mengosongkan layar? Kapan pola itu penting?**<br>
+Jawaban:<br>
+- Menampilkan data lama (*stale data*) sambil memberi indikator refresh membuat pengguna tetap mengetahui bahwa aplikasi sedang bekerja (loading), bukan mengalami macet atau lag. Data lama tetap terlihat di layar sehingga pengguna tidak merasa kebingungan karena layar tiba-tiba kosong, dan mereka dapat menunggu dengan tenang sampai data baru selesai dimuat, sambil tetap dapat melihat atau menggunakan data lama untuk sementara waktu. Pola ini penting terutama pada aplikasi yang sering melakukan proses refresh (misalnya *pull-to-refresh* pada daftar produk atau notifikasi), karena mengosongkan layar setiap kali refresh dilakukan akan terasa mengganggu dan membuat pengalaman pengguna terasa tidak stabil.
+
+---
