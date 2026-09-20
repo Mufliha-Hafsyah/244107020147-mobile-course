@@ -24,3 +24,32 @@ Praktikum ini membangun fondasi layer data aplikasi: model `Post` untuk mem-pars
 - **`PostRepository`** (`lib/data/repositories/post_repository.dart`): satu-satunya bagian kode yang memanggil Dio secara langsung. Method `fetchPosts()` sengaja tidak diberi `try/catch`, karena error yang terjadi dibiarkan naik ke pemanggilnya dan nanti ditangani otomatis oleh provider sebagai `AsyncError`.
 
 ---
+### Praktikum 2: Provider dan error handling
+
+#### Hasil Pengujian Tiga Skenario Error
+
+**Skenario 1 — Jalankan aplikasi dengan internet normal, amati loading lalu daftar 100 posts**
+
+| Loading | Post 1-8 | Post 92-100 |
+|---|---|---|
+| ![Loading](screenshots/praktikum2-loading.png) | ![Awal](screenshots/praktikum2-success-awal.png) | ![Akhir](screenshots/praktikum2-success-akhir.png) |
+
+<br>
+Loading tampil singkat sebelum data muncul, dan seluruh 100 post dari JSONPlaceholder berhasil dimuat dan ditampilkan dengan benar dari awal hingga akhir daftar.
+
+**Skenario 2 — Matikan internet (mode pesawat), tekan refresh, amati pesan ramah + tombol Coba lagi. Nyalakan kembali internet, tekan Coba lagi.**
+
+| Error saat pffline | Setelah online kembali |
+|---|---|
+| ![Offline](screenshots/praktikum2-error-offline.png) | ![Recovery](screenshots/praktikum2-recovery-online.png) |
+
+<br>
+Saat tidak ada koneksi internet, pesan ramah "Tidak dapat terhubung ke server. Periksa internet Anda." muncul beserta tombol Coba lagi. Setelah internet dinyalakan kembali dan tombol Coba lagi ditekan, data berhasil dimuat ulang sepenuhnya.
+
+**Skenario 3 — Sementara ubah baseUrl menjadi URL salah, amati pesan error koneksi. Kembalikan setelah uji**
+
+![Wrong URL](screenshots/praktikum2-error-wrongurl.png)
+
+Pesan error koneksi muncul karena domain yang dituju tidak dapat dijangkau. Setelah `baseUrl` dikembalikan ke alamat yang benar, aplikasi kembali berjalan normal.
+
+---
