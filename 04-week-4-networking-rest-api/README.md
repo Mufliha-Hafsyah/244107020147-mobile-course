@@ -78,3 +78,25 @@ Dokumentasi lengkap proses AI Prompt Challenge (prompt yang digunakan, output aw
 [docs/ai-verification.md](docs/ai-verification.md)
 
 ---
+
+---
+
+### Refactoring Challenge
+
+Tiga penyesuaian dilakukan untuk merapikan struktur kode dan menambah fitur navigasi:
+
+1. **Ekstrak `PostTile`** (`lib/widgets/post_tile.dart`): baris tampilan post yang sebelumnya ditulis langsung di dalam `ListView.builder` diekstrak menjadi widget tersendiri, menerima `post` dan `onTap` opsional. Widget ini dipakai ulang di `PagedPostPage`.
+2. **Pindahkan `friendlyErrorMessage`** ke `lib/data/network_errors.dart`, agar dapat dipakai bersama oleh halaman post biasa (`PostListPage`), halaman paginated (`PagedPostPage`), maupun halaman detail (`PostDetailPage`), tanpa duplikasi logic penerjemahan error.
+3. **Tambah halaman detail dengan GoRouter** (`lib/pages/post_detail_page.dart`, route `/post/:id`): menampilkan `title` dan `body` lengkap dari post yang dipilih. Data diambil dari `postListProvider` yang sudah dimuat sebelumnya, sehingga tidak perlu request tambahan saat berpindah dari list ke detail.
+
+#### Hasil Implementasi
+
+| List dengan PostTile | Halaman detail |
+|---|---|
+| ![List](screenshots/refactor-posttile-list.png) | ![Detail](screenshots/refactor-post-detail.png) |
+
+#### Analisis
+
+Karena `PostDetailPage` mengambil data dari `postListProvider` yang sudah ter-cache, navigasi dari list ke detail berlangsung instan tanpa loading tambahan. Namun, hal ini menimbulkan konsekuensi pada skenario deep-link: jika halaman detail dibuka langsung melalui URL (misalnya `/post/5`) tanpa pernah membuka halaman list terlebih dahulu, `postListProvider` akan otomatis memuat seluruh 100 post terlebih dahulu sebelum menemukan post yang dicari. Pendekatan ini dipilih karena sesuai dengan alur penggunaan aplikasi saat ini (pengguna selalu mengakses detail melalui list), namun bila aplikasi perlu mendukung deep-link langsung ke detail secara efisien, pendekatan yang lebih tepat adalah memanggil repository secara langsung berdasarkan `id` tanpa bergantung pada list yang sudah dimuat.
+
+---
