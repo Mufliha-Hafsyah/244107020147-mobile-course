@@ -53,3 +53,20 @@ Saat tidak ada koneksi internet, pesan ramah "Tidak dapat terhubung ke server. P
 Pesan error koneksi muncul karena domain yang dituju tidak dapat dijangkau. Setelah `baseUrl` dikembalikan ke alamat yang benar, aplikasi kembali berjalan normal.
 
 ---
+### Praktikum 3: Pagination dasar
+
+#### Hasil Implementasi
+
+| Halaman 1 | Saat loading halaman berikutnya |
+|---|---|
+| ![Halaman 1](screenshots/praktikum3-paged-halaman1.png) | ![Loading](screenshots/praktikum3-paged-halaman2.png) |
+
+| Halaman tengah | Halaman terakhir |
+|---|---|
+| ![Halaman Tengah](screenshots/praktikum3-paged-halaman-tengah.png) | ![Selesai](screenshots/praktikum3-paged-selesai.png) |
+
+#### Analisis
+
+Pengujian membuktikan bahwa data lama tetap ditampilkan selama proses pemuatan halaman berikutnya berlangsung (indikator loading muncul di bagian bawah list, bukan menggantikan seluruh tampilan), sesuai konsep infinite scroll yang diharapkan. Guard ganda pada `loadNextPage()` juga terbukti berhasil mencegah request berlebihan meskipun listener scroll berpotensi terpanggil berkali-kali dalam waktu singkat saat pengguna scroll dengan cepat. Setelah seluruh 100 data berhasil dimuat, `hasMore` bernilai `false` dan aplikasi menampilkan teks "Semua data termuat." tanpa melakukan request tambahan yang tidak perlu.
+
+---
