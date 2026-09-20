@@ -79,8 +79,6 @@ Dokumentasi lengkap proses AI Prompt Challenge (prompt yang digunakan, output aw
 
 ---
 
----
-
 ### Refactoring Challenge
 
 Tiga penyesuaian dilakukan untuk merapikan struktur kode dan menambah fitur navigasi:
@@ -98,5 +96,20 @@ Tiga penyesuaian dilakukan untuk merapikan struktur kode dan menambah fitur navi
 #### Analisis
 
 Karena `PostDetailPage` mengambil data dari `postListProvider` yang sudah ter-cache, navigasi dari list ke detail berlangsung instan tanpa loading tambahan. Namun, hal ini menimbulkan konsekuensi pada skenario deep-link: jika halaman detail dibuka langsung melalui URL (misalnya `/post/5`) tanpa pernah membuka halaman list terlebih dahulu, `postListProvider` akan otomatis memuat seluruh 100 post terlebih dahulu sebelum menemukan post yang dicari. Pendekatan ini dipilih karena sesuai dengan alur penggunaan aplikasi saat ini (pengguna selalu mengakses detail melalui list), namun bila aplikasi perlu mendukung deep-link langsung ke detail secara efisien, pendekatan yang lebih tepat adalah memanggil repository secara langsung berdasarkan `id` tanpa bergantung pada list yang sudah dimuat.
+
+---
+
+## Testing
+
+Empat unit test dibuat di `test/post_test.dart` untuk menguji parsing model, mapping error, dan provider menggunakan repository palsu (tanpa koneksi internet asli):
+
+1. **`fromJson` aman terhadap field yang hilang** memverifikasi bahwa `Post.fromJson({'id': 7})` tidak crash meski hanya field `id` yang tersedia, dan field lain (`title`, `userId`) jatuh ke nilai default.
+2. **`friendlyErrorMessage` untuk connection error** memverifikasi bahwa `DioExceptionType.connectionError` diterjemahkan ke pesan yang mengandung kata "terhubung".
+3. **Provider sukses dengan repository palsu** menggunakan `FakePostRepository` yang mengembalikan data statis, memverifikasi `postListProvider` menghasilkan data yang sesuai tanpa melakukan request HTTP sungguhan.
+4. **Provider error dengan repository palsu** `FakePostRepository` dikonfigurasi untuk selalu melempar `DioException`, memverifikasi `postListProvider` menghasilkan `AsyncError` yang benar dan pesan ramahnya sesuai.
+
+
+**Hasil:**
+![testing](/screenshots/test-success.png)
 
 ---
