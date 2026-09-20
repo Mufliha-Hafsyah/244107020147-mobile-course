@@ -191,3 +191,27 @@ flutter run
 ```
 
 ---
+
+## Refleksi
+
+1. **Mengapa UI dilarang memanggil Dio langsung? Apa yang rusak jika aturan ini dilanggar?**<br>
+Jawaban:<br>
+UI dilarang memanggil Dio secara langsung karena akan membuat widget bertanggung jawab atas terlalu banyak hal sekaligus diantaranya menampilkan tampilan, mengatur state, sekaligus menangani detail teknis jaringan seperti timeout dan error handling. Jika aturan ini dilanggar, kode jaringan akan tersebar di banyak widget yang berbeda, sehingga sulit diuji (karena widget test biasanya tidak seharusnya melakukan request HTTP sungguhan), sulit diganti sumber datanya (misalnya saat ingin memakai repository palsu untuk testing seperti pada `FakePostRepository`), dan setiap perubahan pada logic jaringan (misalnya menambah header baru) harus dilakukan berulang kali di banyak tempat, bukan cukup di satu file `api_client.dart` saja. Repository pattern memisahkan urusan ini, sehingga UI cukup fokus membaca `AsyncValue` dari provider tanpa perlu tahu detail bagaimana data itu diambil.<br>
+
+2. **Kapan pagination client-side cukup, dan kapan harus mengandalkan pagination server (`_page`/`_limit`)?**<br>
+Jawaban:<br>
+Pagination client-side cukup digunakan ketika jumlah data keseluruhan relatif kecil, sehingga tidak membebani jaringan maupun memori perangkat secara berarti. Namun, untuk data dalam jumlah besar seperti 100 post pada JSONPlaceholder, pagination server (menggunakan parameter `_page` dan `_limit`) jauh lebih tepat, karena hanya data yang benar-benar dibutuhkan saat itu yang diminta ke server. Hal ini mengurangi waktu tunggu di awal, menghemat kuota data pengguna, dan tetap membuat aplikasi responsif meskipun total data di server terus bertambah seiring waktu.<br>
+
+3. **Bagaimana exception repository berubah menjadi `AsyncError` tanpa try/catch di setiap widget? Kapan try/catch eksplisit tetap dibutuhkan?**<br>
+Jawaban:<br>
+Ketika method `build()` pada `AsyncNotifier` (seperti `PostListNotifier`) memanggil repository dan repository tersebut melempar exception, Riverpod secara otomatis menangkap exception itu dan mengemasnya menjadi `AsyncError`, tanpa perlu penulisan `try/catch` secara eksplisit. Inilah yang dimaksud pada modul sebagai "ekuivalen deklaratif dari `AsyncValue.guard`". Widget yang membaca provider tersebut lewat `.when()` otomatis mendapat cabang `error` tanpa harus menangani exception secara manual.<br>
+
+Namun, `try/catch` eksplisit tetap dibutuhkan pada method yang dipanggil di luar siklus `build()`, seperti method `refresh()` pada `PostListNotifier`. Karena `refresh()` dipicu secara manual oleh pengguna (menekan tombol refresh), bukan oleh mekanisme internal Riverpod saat inisialisasi provider, exception yang terjadi di dalamnya tidak akan otomatis dikonversi menjadi `AsyncError` kecuali ditangkap secara manual dan di-assign ke `state` menggunakan `try/catch`.<br>
+
+4. **Bagian mana dari hasil AI yang Anda perbaiki, dan mengapa?**
+
+Pada AI Prompt Challenge, kode awal yang dihasilkan AI untuk repository layer `Comments` ternyata gagal sejak tahap `flutter analyze`, dan perlu tiga kali iterasi perbaikan sebelum benar-benar berhasil. Pertama, deklarasi provider dengan generic type yang dipecah menjadi dua baris menyebabkan 37 error sekaligus akibat kesalahan sintaks, sehingga diperbaiki dengan menuliskannya kembali dalam satu baris utuh.<br>
+Kedua, AI menggunakan kelas `FamilyAsyncNotifier` yang ternyata tidak kompatibel dengan versi `flutter_riverpod` yang digunakan pada proyek ini, sehingga pendekatan diganti sepenuhnya menjadi `FutureProvider.family` yang lebih sederhana dan tetap memenuhi kebutuhan penanganan error otomatis. <br>
+Ketiga, file `test/widget_test.dart` bawaan Flutter yang masih berisi pengujian counter default menyebabkan kegagalan test, sehingga perlu dikosongkan dan diberi fungsi `main()` kosong sebagai penanda. Pengalaman ini menunjukkan bahwa kode hasil AI, meskipun secara konsep sudah sesuai dengan permintaan, tetap wajib diverifikasi secara teknis melalui `flutter analyze` dan `flutter test`, karena kesalahan bisa muncul dari hal-hal teknis seperti kompatibilitas versi package dan format penulisan kode, bukan hanya dari kesalahan logika.<br>
+
+---
