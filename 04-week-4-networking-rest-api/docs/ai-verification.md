@@ -94,5 +94,7 @@ test('fromJson aman terhadap field yang hilang', () {
 ---
 ### Kesimpulan
 
+
 Berbeda dari pengalaman AI Prompt Challenge pada minggu sebelumnya yang kodenya secara struktural sudah benar namun bermasalah pada pengujian, kode AI pada tantangan minggu ini justru gagal sejak tahap kompilasi (`flutter analyze`). Ditemukan tiga masalah berbeda: kesalahan sintaks akibat pemisahan baris pada deklarasi generic, penggunaan kelas API (`FamilyAsyncNotifier`) yang tidak kompatibel dengan versi package yang digunakan, serta konflik dengan file test bawaan Flutter. Pengalaman ini menegaskan bahwa kode hasil AI tidak boleh diasumsikan langsung dapat dikompilasi maupun dijalankan, sekalipun secara konsep sudah sesuai dengan requirement yang diberikan. Verifikasi menyeluruh terhadap `flutter analyze` dan `flutter test`, bukan hanya pembacaan kode secara sekilas, tetap menjadi langkah wajib sebelum kode AI diterima.
+
 ---
