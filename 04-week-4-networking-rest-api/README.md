@@ -109,34 +109,34 @@ Empat unit test dibuat di `test/post_test.dart` untuk menguji parsing model, map
 4. **Provider error dengan repository palsu** `FakePostRepository` dikonfigurasi untuk selalu melempar `DioException`, memverifikasi `postListProvider` menghasilkan `AsyncError` yang benar dan pesan ramahnya sesuai.
 
 
-**Hasil:**
-![testing](/screenshots/test-success.png)<br>
+**Hasil:**<br>
+![testing](screenshots/testPassed.png)<br>
 
 ---
 
 ### Checklist Verifikasi Mandiri
 
-1. UI tidak memanggil Dio langsung, semua akses data lewat repository + provider.<br> 
+**1. UI tidak memanggil Dio langsung, semua akses data lewat repository + provider.**<br> 
 | Post 1-9 | Post 92-100 |
 |---|---|
 | ![Awal](screenshots/praktikum2-success-awal.png) | ![Akhir](screenshots/praktikum2-success-akhir.png) |
 <br>
 seluruh akses data melalui `PostRepository` dan provider (`postListProvider`, `pagedPostsProvider`).
 
-2. Empat state tampil benar: loading, error (+ retry), empty, success.<br>
+**2. Empat state tampil benar: loading, error (+ retry), empty, success.**<br>
 | Loading | Error (+ retry)| Empty| Success |
 |---|---|---|---|
 | ![Loading](screenshots/praktikum2-loading.png) | ![Offline](screenshots/praktikum2-error-offline.png) | ![Empty](screenshots/praktikum2-empty.png) | ![Awal](screenshots/praktikum2-success-awal.png) |
 
-3. Pagination: data bertambah saat scroll, tidak ada request ganda, ada indikator akhir data.<br>
+**3. Pagination: data bertambah saat scroll, tidak ada request ganda, ada indikator akhir data.**<br>
 | Halaman Awal | Halaman Tengah | Halaman Akhir |
 |---|---|---|
 | ![Halaman 1](screenshots/praktikum3-paged-halaman1.png)| ![Halaman Tengah](screenshots/praktikum3-paged-halaman-tengah.png) | ![Selesai](screenshots/praktikum3-paged-selesai.png) |
 
-4. `flutter analyze` tanpa issue dan semua test lulus.<br>
-![testing](/screenshots/test-success.png)<br><br>
+**4. `flutter analyze` tanpa issue dan semua test lulus.**<br>
+![testing](screenshots/testPassed.png)<br><br>
 
-5. Hasil AI diverifikasi dan didokumentasikan pada folder docs/. <br> 
+**5. Hasil AI diverifikasi dan didokumentasikan pada folder docs/.**<br> 
 Hasil AI Prompt Challenge diverifikasi menggunakan AI Verification Checklist dan didokumentasikan lengkap pada [`docs/ai-verification.md`](docs/ai-verification.md).
 
 ---
