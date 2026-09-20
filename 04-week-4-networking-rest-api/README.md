@@ -28,25 +28,25 @@ Praktikum ini membangun fondasi layer data aplikasi: model `Post` untuk mem-pars
 
 #### Hasil Pengujian Tiga Skenario Error
 
-**Skenario 1 — Jalankan aplikasi dengan internet normal, amati loading lalu daftar 100 posts**
+**Skenario 1: Jalankan aplikasi dengan internet normal, amati loading lalu daftar 100 posts**
 
-| Loading | Post 1-8 | Post 92-100 |
+| Loading | Post 1-9 | Post 92-100 |
 |---|---|---|
 | ![Loading](screenshots/praktikum2-loading.png) | ![Awal](screenshots/praktikum2-success-awal.png) | ![Akhir](screenshots/praktikum2-success-akhir.png) |
 
-<br>
 Loading tampil singkat sebelum data muncul, dan seluruh 100 post dari JSONPlaceholder berhasil dimuat dan ditampilkan dengan benar dari awal hingga akhir daftar.
+<br><br>
 
-**Skenario 2 — Matikan internet (mode pesawat), tekan refresh, amati pesan ramah + tombol Coba lagi. Nyalakan kembali internet, tekan Coba lagi.**
+**Skenario 2: Matikan internet (mode pesawat), tekan refresh, amati pesan ramah + tombol Coba lagi. Nyalakan kembali internet, tekan Coba lagi.**
 
 | Error saat pffline | Setelah online kembali |
 |---|---|
 | ![Offline](screenshots/praktikum2-error-offline.png) | ![Recovery](screenshots/praktikum2-recovery-online.png) |
 
-<br>
 Saat tidak ada koneksi internet, pesan ramah "Tidak dapat terhubung ke server. Periksa internet Anda." muncul beserta tombol Coba lagi. Setelah internet dinyalakan kembali dan tombol Coba lagi ditekan, data berhasil dimuat ulang sepenuhnya.
+<br><br>
 
-**Skenario 3 — Sementara ubah baseUrl menjadi URL salah, amati pesan error koneksi. Kembalikan setelah uji**
+**Skenario 3: Sementara ubah baseUrl menjadi URL salah, amati pesan error koneksi. Kembalikan setelah uji**
 
 ![Wrong URL](screenshots/praktikum2-error-wrongurl.png)
 
