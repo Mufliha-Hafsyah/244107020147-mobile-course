@@ -120,8 +120,7 @@ Empat unit test dibuat di `test/post_test.dart` untuk menguji parsing model, map
 | Post 1-9 | Post 92-100 |
 |---|---|
 | ![Awal](screenshots/praktikum2-success-awal.png) | ![Akhir](screenshots/praktikum2-success-akhir.png) |
-<br>
-seluruh akses data melalui `PostRepository` dan provider (`postListProvider`, `pagedPostsProvider`).
+seluruh akses data melalui `PostRepository` dan provider (`postListProvider`, `pagedPostsProvider`).<br>
 
 **2. Empat state tampil benar: loading, error (+ retry), empty, success.**<br>
 | Loading | Error (+ retry)| Empty| Success |
@@ -134,9 +133,61 @@ seluruh akses data melalui `PostRepository` dan provider (`postListProvider`, `p
 | ![Halaman 1](screenshots/praktikum3-paged-halaman1.png)| ![Halaman Tengah](screenshots/praktikum3-paged-halaman-tengah.png) | ![Selesai](screenshots/praktikum3-paged-selesai.png) |
 
 **4. `flutter analyze` tanpa issue dan semua test lulus.**<br>
-![testing](screenshots/testPassed.png)<br><br>
+![testing](screenshots/testPassed.png)<br>
 
 **5. Hasil AI diverifikasi dan didokumentasikan pada folder docs/.**<br> 
 Hasil AI Prompt Challenge diverifikasi menggunakan AI Verification Checklist dan didokumentasikan lengkap pada [`docs/ai-verification.md`](docs/ai-verification.md).
+
+---
+
+### Mini Project: Aplikasi Daftar Data dari REST API
+
+Seluruh requirement mini project sudah terpenuhi melalui pengerjaan praktikum dan tantangan di atas:
+
+**1. Ambil data dari API dummy:**<br> 
+Data diambil dari JSONPlaceholder (`/posts`) melalui `PostRepository`, ditampilkan ke UI melalui `postListProvider` dan `pagedPostsProvider` (Riverpod).<br>
+![Success](screenshots/praktikum2-success-awal.png)
+<br>
+
+**2. Dio terpusat:**<br> 
+Konfigurasi `baseUrl`, timeout, dan `LogInterceptor` didefinisikan satu kali di `createDio()` (`lib/data/api_client.dart`), dipakai bersama oleh seluruh repository. Model `Post` dan `Comment` menggunakan `fromJson` yang aman terhadap null.
+<br>
+
+**3. Empat state UI**:<br> 
+Loading, error (dengan tombol retry), empty, dan success ditangani dan diuji pada Praktikum 2.
+
+| Loading | Error (+ retry)| Empty| Success |
+|---|---|---|---|
+| ![Loading](screenshots/praktikum2-loading.png) | ![Offline](screenshots/praktikum2-error-offline.png) | ![Empty](screenshots/praktikum2-empty.png) | ![Awal](screenshots/praktikum2-success-awal.png) |
+<br>
+
+**4. Pagination dengan infinite scroll:**<br>
+10 item per halaman, guard ganda mencegah request bersamaan, indikator loading dan "Semua data termuat." ditampilkan sesuai kondisi.
+
+   | Halaman 1 | Halaman terakhir |
+   |---|---|
+   | ![Halaman 1](screenshots/praktikum3-paged-halaman1.png) | ![Selesai](screenshots/praktikum3-paged-selesai.png) |
+<br>
+
+**5. Minimal 2 test yang lulus:**<br> 
+Empat unit test tersedia di `test/post_test.dart` : parsing model aman null, mapping error, serta dua test provider menggunakan `FakePostRepository` (sukses dan gagal), tanpa melakukan request HTTP sungguhan.<br>
+![Test Passed](screenshots/testPassed.png)
+<br>
+
+**6. AI Prompt Challenge terdokumentasi:**<br> Prompt, output awal AI, tiga masalah yang ditemukan, proses perbaikan, dan hasil akhir didokumentasikan lengkap di [`docs/ai-verification.md`](docs/ai-verification.md).
+<br>
+
+**7. Struktur folder sesuai portofolio:**<br>
+Project ditempatkan di `04-week-4-networking-rest-api/` dengan struktur `lib/`, `test/`, `docs/`, `screenshots/`, dan `README.md` ini.<br>
+![Struktur Folder](screenshots/struktur-folder.png)
+
+
+#### Cara Menjalankan
+
+```bash
+cd 04-week-4-networking-rest-api
+flutter pub get
+flutter run
+```
 
 ---
