@@ -36,7 +36,7 @@ Seluruh akses `SharedPreferences.getInstance()` dipusatkan pada `PrefsRepository
 Badge "Belum sinkron: X" pada `AppBar` terbukti akurat mengikuti jumlah catatan dengan `dirty = true`, bertambah saat catatan baru ditambahkan (karena `addNote` selalu membuat catatan dengan `dirty: true`) dan berkurang saat catatan dihapus. 
 
 ---
-### Praktikum 3: Cache-First Read dan Sinkronisasi Dirty Flag
+### Praktikum 3: Cache-first dan antrean sync
 
 #### Hasil Implementasi
 
@@ -48,5 +48,12 @@ Badge "Belum sinkron: X" pada `AppBar` terbukti akurat mengikuti jumlah catatan 
 
 - Pengujian mode offline membuktikan bahwa data cache tetap dapat diakses sepenuhnya tanpa koneksi internet, karena `cachedPostsProvider` membaca dari tabel `cached_posts` di SQLite, bukan langsung dari jaringan. Kegagalan `_refreshInBackground()` saat offline ditangani secara diam-diam (`catch (_) {}`) agar tidak mengganggu data cache yang sudah valid ditampilkan ke pengguna.
 - Tombol sinkronisasi pada `NotesPage` memanggil `syncNotes()` yang membaca `countDirty()` terlebih dahulu, lalu menandai seluruh catatan sebagai bersih (`dirty = 0`) setelah simulasi pengiriman ke server berhasil. Invalidasi pada `notesProvider` dan `dirtyCountProvider` setelah sinkronisasi memastikan badge dan label "Belum tersinkron" pada tiap catatan langsung diperbarui tanpa perlu me-restart aplikasi.
+
+---
+### AI Prompt Challenge
+
+Dokumentasi lengkap proses AI Prompt Challenge (prompt yang digunakan, output awal AI, temuan masalah, dan proses perbaikan) dapat dilihat di:
+
+[docs/ai-verification.md](docs/ai-verification.md)
 
 ---
