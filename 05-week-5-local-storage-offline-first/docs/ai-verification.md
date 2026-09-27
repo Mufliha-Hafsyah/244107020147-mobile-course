@@ -101,8 +101,8 @@ Built with build_runner/aot in 83s with warnings; wrote 24 outputs.
 
 File `notes_table.g.dart` hasil generate: **555 baris kode**.<br>
 
-![BuildRunner](screenshots/ai-challenge-drift-buildrunner-terminal.png)<br>
-![GeneratedCode](screenshots/ai-challenge-drift-generated-code.png)<br>
+![BuildRunner](../screenshots/ai-challenge-drift-buildrunner-terminal.png)<br>
+![GeneratedCode](../screenshots/ai-challenge-drift-generated-code.png)<br>
 
 ### Kesimpulan
 
