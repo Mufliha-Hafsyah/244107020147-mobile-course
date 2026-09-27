@@ -1,6 +1,8 @@
 import 'package:sqflite/sqflite.dart';
 import '../local/db.dart';
 import '../local/note.dart';
+import 'dart:convert';
+import 'package:dio/dio.dart';
 
 class NoteRepository {
   NoteRepository({Future<Database> Function()? openDb})
@@ -47,5 +49,34 @@ class NoteRepository {
   Future<void> markAllSynced() async {
     final db = await _openDb();
     await db.update('notes', {'dirty': 0}, where: 'dirty = 1');
+  }
+
+  Future<List<Map<String, dynamic>>> readCachedPosts() async {
+    final db = await _openDb();
+    final rows = await db.query('cached_posts', orderBy: 'id ASC');
+    return rows
+        .map((row) => jsonDecode(row['payload'] as String) as Map<String, dynamic>)
+        .toList();
+  }
+
+  Future<void> saveCachedPosts(List<Map<String, dynamic>> posts) async {
+    final db = await _openDb();
+    final batch = db.batch();
+    batch.delete('cached_posts');
+    for (final post in posts) {
+      batch.insert('cached_posts', {
+        'id': post['id'],
+        'payload': jsonEncode(post),
+        'cached_at': DateTime.now().toIso8601String(),
+      });
+    }
+    await batch.commit(noResult: true);
+  }
+
+  Future<List<Map<String, dynamic>>> fetchPostsFromNetwork() async {
+    final dio = Dio(BaseOptions(baseUrl: 'https://jsonplaceholder.typicode.com'));
+    final response = await dio.get<List>('/posts');
+    final data = response.data ?? [];
+    return data.whereType<Map<String, dynamic>>().toList();
   }
 }

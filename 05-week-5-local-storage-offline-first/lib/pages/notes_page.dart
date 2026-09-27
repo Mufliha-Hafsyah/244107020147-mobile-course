@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/local/note.dart';
 import '../data/repositories/note_repository.dart';
+import '../data/sync.dart';
 
 final noteRepositoryProvider = Provider<NoteRepository>((ref) => NoteRepository());
 
@@ -42,6 +43,20 @@ class NotesPage extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Catatan'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.sync),
+            onPressed: () async {
+              final repository = ref.read(noteRepositoryProvider);
+              final synced = await syncNotes(repository);
+              ref.invalidate(notesProvider);
+              ref.invalidate(dirtyCountProvider);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('$synced catatan berhasil disinkron')),
+                );
+              }
+            },
+          ),
           dirtyCountAsync.when(
             loading: () => const SizedBox.shrink(),
             error: (_, _) => const SizedBox.shrink(),
