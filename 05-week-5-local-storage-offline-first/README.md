@@ -88,8 +88,6 @@ Tiga unit test dibuat di `test/note_test.dart` untuk menguji model `Note` dan pr
 **Hasil:**<br>
 ![Testing](screenshots/flutter-test.png) 
 
----
-
 
 ---
 
