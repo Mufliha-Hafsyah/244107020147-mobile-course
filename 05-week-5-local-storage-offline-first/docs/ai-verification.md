@@ -99,11 +99,13 @@ Built with build_runner/aot in 83s with warnings; wrote 24 outputs.
 ```
 
 
-File `notes_table.g.dart` hasil generate: **555 baris kode**.
-![BuildRunner](/screenshots/ai-challenge-drift-buildrunner-terminal.png)<br>
-![GeneratedCode](/screenshots/ai-challenge-drift-generated-code.png)<br>
+File `notes_table.g.dart` hasil generate: **555 baris kode**.<br>
+
+![BuildRunner](screenshots/ai-challenge-drift-buildrunner-terminal.png)<br>
+![GeneratedCode](screenshots/ai-challenge-drift-generated-code.png)<br>
 
 ### Kesimpulan
 
 Estimasi boilerplate dari AI terbukti akurat setelah diuji langsung: instalasi Drift butuh lebih dari 2x dependency dibanding Hive, dan proses `build_runner` menghasilkan 555 baris kode otomatis dari hanya 6 baris definisi tabel dalam waktu ~83 detik. Percobaan ini juga menemukan dua hal yang tidak disebutkan AI — versi package `sqlite3_flutter_libs` yang sudah *end-of-life*, dan flag CLI `--delete-conflicting-outputs` yang ternyata deprecated. Rekomendasi akhir tetap SharedPreferences + sqflite, karena skala aplikasi saat ini belum membutuhkan reaktivitas stream native atau biaya setup Drift yang jauh lebih berat.
+
 ---
