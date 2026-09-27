@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/prefs.dart';
 
@@ -17,5 +18,27 @@ class DarkModeNotifier extends AsyncNotifier<bool> {
       await ref.read(prefsRepositoryProvider).setDarkMode(next);
       return next;
     });
+  }
+}
+
+class SettingsPage extends ConsumerWidget {
+  const SettingsPage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final darkModeAsync = ref.watch(darkModeProvider);
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Pengaturan')),
+      body: darkModeAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, _) => Center(child: Text('Gagal memuat: $err')),
+        data: (isDark) => SwitchListTile(
+          title: const Text('Mode Gelap'),
+          value: isDark,
+          onChanged: (_) => ref.read(darkModeProvider.notifier).toggle(),
+        ),
+      ),
+    );
   }
 }

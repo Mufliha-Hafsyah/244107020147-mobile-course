@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/local/note.dart';
 import '../data/repositories/note_repository.dart';
 import '../data/sync.dart';
+import 'widgets/note_tile.dart';
+import 'package:go_router/go_router.dart';
 
 final noteRepositoryProvider = Provider<NoteRepository>((ref) => NoteRepository());
 
@@ -40,12 +42,16 @@ class NotesPage extends ConsumerWidget {
     final dirtyCountAsync = ref.watch(dirtyCountProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Catatan'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.sync),
-            onPressed: () async {
+        appBar: AppBar(
+          title: const Text('Catatan'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () => context.push('/settings'),
+            ),
+            IconButton(
+              icon: const Icon(Icons.sync),
+              onPressed: () async {
               final repository = ref.read(noteRepositoryProvider);
               final synced = await syncNotes(repository);
               ref.invalidate(notesProvider);
@@ -78,14 +84,11 @@ class NotesPage extends ConsumerWidget {
                 itemCount: notes.length,
                 itemBuilder: (context, index) {
                   final note = notes[index];
-                  return ListTile(
-                    title: Text(note.title),
-                    subtitle: note.dirty ? const Text('Belum tersinkron') : null,
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () =>
-                          ref.read(notesProvider.notifier).deleteNote(note.id!),
-                    ),
+                  return NoteTile(
+                    note: note,
+                    onDelete: () =>
+                        ref.read(notesProvider.notifier).deleteNote(note.id!),
+                    onTap: () => context.push('/note/${note.id}'),
                   );
                 },
               ),
