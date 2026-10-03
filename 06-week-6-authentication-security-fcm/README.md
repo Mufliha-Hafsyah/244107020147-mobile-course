@@ -49,3 +49,27 @@
 Notifikasi yang berhasil masuk ke panel sistem Android saat aplikasi berjalan di background membuktikan bahwa pendaftaran token dan topik ke FCM sudah berfungsi dengan benar, serta mengonfirmasi bahwa project Firebase (package name, `google-services.json`, dan konfigurasi Gradle) sudah terpasang secara tepat.
 
 ---
+
+### Praktikum 3: Payload, Tiga App State, Klik dan Topik
+
+#### Matriks Pengujian
+
+| State | Yang diharapkan | Cara uji | Hasil |
+|---|---|---|---|
+| Foreground | Banner lokal muncul, klik masuk ke `/pengumuman/3` | Aplikasi terbuka, kirim dari Firebase Console | ![Uji Foreground](screenshots/praktikum3-foreground.gif) |
+| Background | Banner sistem muncul, klik masuk ke rute yang benar | Tekan Home, kirim, klik notifikasi | ![Uji Background](screenshots/praktikum3-background.gif) |
+| Terminated | Aplikasi terbuka ke rute yang benar via `getInitialMessage` | Swipe-close aplikasi, kirim, klik notifikasi | ![Uji Terminated](screenshots/praktikum3-terminated.gif) |
+
+#### Topic Messaging
+
+| Target: Topic di Firebase Console | Notifikasi Diterima |
+|---|---|
+| ![Topic Target](screenshots/praktikum3-topic-target.png) | ![Topic Received](screenshots/praktikum3-topic-received.png) |
+
+Subscribe ke topik `pengumuman-kampus` dilakukan otomatis saat `initFcmToken()` dipanggil (Praktikum 2). Pengujian ini membuktikan notifikasi tetap sampai ke device meski dikirim lewat topic, bukan langsung ke token aplikasi, cocok dipakai untuk pesan broadcast seperti pengumuman seluruh mahasiswa.
+
+#### Analisis
+
+Ketiga app state berhasil diuji dengan payload gabungan `notification + data`, membuktikan bahwa `data.route` konsisten tersedia dan dapat diproses baik oleh handler foreground (`onMessage`), klik dari background (`onMessageOpenedApp`), maupun saat aplikasi dibuka dari kondisi mati total (`getInitialMessage`). Bug `pendingDeepLink` yang ditemukan pada percobaan pertama Uji Foreground menunjukkan pentingnya menguji klik notifikasi pada kondisi nyata, bukan hanya memastikan notifikasi tampil di layar, modul secara eksplisit menyebut hal ini sebagai salah satu bug FCM paling mahal yang tidak terlihat hanya dari membaca kode.
+
+---

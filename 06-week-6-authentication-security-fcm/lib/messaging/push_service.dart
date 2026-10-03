@@ -1,5 +1,6 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter/foundation.dart';
 
 final _local = FlutterLocalNotificationsPlugin();
 
@@ -12,14 +13,16 @@ Future<bool> requestNotificationPermission() async {
       settings.authorizationStatus == AuthorizationStatus.provisional;
 }
 
-Future<void> initLocalNotifications() async {
+Future<void> initLocalNotifications({
+  required void Function(String route) onTapNotification,
+}) async {
   const android = AndroidInitializationSettings('@mipmap/ic_launcher');
   const ios = DarwinInitializationSettings();
   await _local.initialize(
     settings: const InitializationSettings(android: android, iOS: ios),
     onDidReceiveNotificationResponse: (response) {
-      // Klik banner foreground -> teruskan payload ke router.
-      pendingDeepLink = response.payload;
+      final route = response.payload;
+      if (route != null) onTapNotification(route);
     },
   );
 }
@@ -40,3 +43,50 @@ Future<void> initFcmToken({
   // 3. Langganan topik kampus (mis. semua mahasiswa angkatan).
   await FirebaseMessaging.instance.subscribeToTopic('pengumuman-kampus');
 }
+
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // Jangan akses BuildContext / Riverpod di sini.
+  // Tugasnya: catat / simpan ringan saja. Navigasi dilakukan saat klik.
+  debugPrint('Pesan diterima di background: ${message.messageId}');
+}
+
+void registerBackgroundHandler() {
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+}
+
+String routeFromMessage(Map<String, dynamic> data) {
+  final route = data['route'] as String? ?? '/';
+  return route.startsWith('/') ? route : '/$route';
+}
+
+void listenForeground(void Function(String route) go) {
+  // Foreground: sistem TIDAK menampilkan banner otomatis,
+  // jadi tampilkan manual via local notification.
+  FirebaseMessaging.onMessage.listen((message) async {
+    final route = routeFromMessage(message.data);
+    const androidDetails = AndroidNotificationDetails(
+      'pengumuman', 'Pengumuman Kampus',
+      importance: Importance.high, priority: Priority.high,
+    );
+    await _local.show(
+      id: message.hashCode,
+      title: message.notification?.title ?? 'Pengumuman',
+      body: message.notification?.body ?? '',
+      notificationDetails: const NotificationDetails(android: androidDetails),
+      payload: route,
+    );
+  });
+
+  // Background -> diklik.
+  FirebaseMessaging.onMessageOpenedApp.listen((message) {
+    go(routeFromMessage(message.data));
+  });
+}
+
+Future<void> handleTerminated(void Function(String route) go) async {
+  // Terminated -> dibuka dari notifikasi.
+  final initial = await FirebaseMessaging.instance.getInitialMessage();
+  if (initial != null) go(routeFromMessage(initial.data));
+}
+
