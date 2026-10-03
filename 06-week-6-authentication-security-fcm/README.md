@@ -73,3 +73,10 @@ Subscribe ke topik `pengumuman-kampus` dilakukan otomatis saat `initFcmToken()` 
 Ketiga app state berhasil diuji dengan payload gabungan `notification + data`, membuktikan bahwa `data.route` konsisten tersedia dan dapat diproses baik oleh handler foreground (`onMessage`), klik dari background (`onMessageOpenedApp`), maupun saat aplikasi dibuka dari kondisi mati total (`getInitialMessage`). Bug `pendingDeepLink` yang ditemukan pada percobaan pertama Uji Foreground menunjukkan pentingnya menguji klik notifikasi pada kondisi nyata, bukan hanya memastikan notifikasi tampil di layar, modul secara eksplisit menyebut hal ini sebagai salah satu bug FCM paling mahal yang tidak terlihat hanya dari membaca kode.
 
 ---
+### AI Prompt Challenge
+
+Dokumentasi lengkap (prompt, output awal AI, audit checklist, dan perbandingan dengan implementasi manual) ada di:
+
+[docs/ai-verification.md](docs/ai-verification.md)
+
+---
