@@ -108,6 +108,8 @@ Karena tingkat kegagalan draf AI sangat tinggi, pendekatan yang diambil bukan me
 ---
 ## Kesimpulan
 
-Draf AI untuk `PushService` secara struktur terlihat masuk akal sekilas (ada semua nama method yang diminta prompt: `requestPermission`, `init`, `subscribeTopic`, dan seterusnya), namun saat diperiksa isi tiap method menggunakan checklist, mayoritas implementasinya ternyata kosong, salah pola (method kelas alih-alih fungsi top-level), atau melanggar prinsip keamanan dasar (mencetak token penuh ke log). Ini menegaskan peringatan pada modul bahwa "bug FCM yang paling mahal (token basi, klik nyasar, banner ganda) tidak terlihat dari membaca kode saja" — draf ini akan lolos code review sekilas karena nama-nama method dan strukturnya meyakinkan, tetapi gagal total begitu diuji perilakunya secara nyata di tiga app state.
+Sekilas draf `PushService` dari AI terlihat masuk akal karena semua nama method yang diminta prompt ada: `requestPermission`, `init`, `subscribeTopic`, dan seterusnya. Tapi begitu isi tiap method diperiksa satu per satu pakai checklist, ternyata banyak yang kosong, salah pola (dibuat method kelas, padahal seharusnya fungsi top-level), atau melanggar prinsip keamanan dasar seperti mencetak token penuh ke log.
+<br><br>
+Ini membuktikan apa yang sudah diingatkan di modul: bug FCM yang paling merepotkan (token basi, klik yang nyasar, notifikasi dobel) tidak akan ketahuan hanya dengan membaca kode. Draf ini kemungkinan besar akan lolos kalau cuma dicek sekilas, karena struktur dan nama methodnya meyakinkan, padahal begitu diuji langsung perilakunya di tiga app state, hasilnya jauh dari yang diharapkan.
 
 ---
