@@ -1,15 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'pages/debug_page.dart';
 import 'pages/home_page.dart';
 import 'pages/login_page.dart';
 import 'providers/auth_provider.dart';
+import 'messaging/push_service.dart';
 
-void main() => runApp(const ProviderScope(child: MyApp()));
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
+  final container = ProviderContainer();
+
+  await requestNotificationPermission();
+  await initLocalNotifications();
+  await initFcmToken(onToken: (token) async {
+    // TODO: kirim token ke backend sungguhan, mis.
+    // await container.read(apiClientProvider).post('/devices', data: {...});
+    final preview = token.length > 12 ? '${token.substring(0, 12)}...' : token;
+    container.read(fcmTokenPreviewProvider.notifier).set(preview);
+  });
+
+  runApp(UncontrolledProviderScope(container: container, child: const MyApp()));
+}
 
 final routerProvider = Provider<GoRouter>((ref) {
-  // Setiap status login berubah, redirect dievaluasi ulang
-  // tanpa membuat ulang router.
   final refresh = ValueNotifier<int>(0);
   ref.listen(authStateProvider, (_, _) => refresh.value++);
   ref.onDispose(refresh.dispose);
@@ -27,6 +44,10 @@ final routerProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
       GoRoute(path: '/', builder: (context, state) => const HomePage()),
+      GoRoute(
+        path: '/debug',
+        builder: (context, state) => const DebugPage(),
+      ),
     ],
   );
 });

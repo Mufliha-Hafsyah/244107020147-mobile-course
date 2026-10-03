@@ -41,3 +41,14 @@ class AuthNotifier extends AsyncNotifier<bool> {
     ref.invalidateSelf();
   }
 }
+
+final fcmTokenPreviewProvider =
+    NotifierProvider<FcmTokenPreviewNotifier, String?>(
+        FcmTokenPreviewNotifier.new);
+
+class FcmTokenPreviewNotifier extends Notifier<String?> {
+  @override
+  String? build() => null;
+
+  void set(String value) => state = value;
+}

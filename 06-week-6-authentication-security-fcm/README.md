@@ -35,3 +35,17 @@
 - Uji logout membuktikan `store.clear()` benar-benar menghapus seluruh token, sehingga `build()` berikutnya membaca `null` dan guard route mengarahkan kembali ke `/login`.
 
 ---
+
+### Praktikum 2: FCM, Permission, dan Token Lifecycle
+
+#### Hasil Implementasi
+
+| Token FCM (Terpotong) di Halaman Debug | Notifikasi Masuk dari Firebase Console |
+|---|---|
+| ![Token Debug](screenshots/praktikum2-token-debug.png) | ![FCM Console Test](screenshots/fcm-console-test.png) |
+
+#### Analisis
+
+Notifikasi yang berhasil masuk ke panel sistem Android saat aplikasi berjalan di background membuktikan bahwa pendaftaran token dan topik ke FCM sudah berfungsi dengan benar, serta mengonfirmasi bahwa project Firebase (package name, `google-services.json`, dan konfigurasi Gradle) sudah terpasang secara tepat.
+
+---
