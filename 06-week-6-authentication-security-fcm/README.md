@@ -109,11 +109,10 @@ Diimplementasikan pada `buildApiClient()` (`lib/data/api_client.dart`), lihat Pr
 
 **3. Guard route mengarahkan ke `/login` saat pengguna belum login.**<br>
 
-| Token Bertahan (Login) | Logout Menghapus Token |
-|---|---|
-| ![Persistensi](screenshots/praktikum1-home.png) | ![Login](screenshots/praktikum1-login.png) |
-
-Dibuktikan lewat uji tutup-buka aplikasi pada Praktikum 1: token tersimpan membuat pengguna langsung masuk Home, sedangkan setelah logout pengguna diarahkan kembali ke Login.
+| Uji | Langkah | Hasil yang Diharapkan | Hasil |
+|---|---|---|---|
+| Token bertahan | Login berhasil, tutup aplikasi total dari recent apps, buka lagi | Langsung masuk Home tanpa login ulang  | ![Uji persistensi token](screenshots/praktikum1-uji-token-bertahan.gif) |
+| Logout menghapus token | Tekan logout, tutup aplikasi total, buka lagi | Tetap di halaman Login | ![Uji persistensi token](screenshots/praktikum1-uji-logout-menghapus-token.gif) |
 <br> 
 
 **4. Token FCM ditampilkan terpotong, tidak pernah ditampilkan atau dicatat secara penuh.**<br>
