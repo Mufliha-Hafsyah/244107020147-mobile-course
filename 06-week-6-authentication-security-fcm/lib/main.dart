@@ -8,6 +8,7 @@ import 'pages/home_page.dart';
 import 'pages/login_page.dart';
 import 'providers/auth_provider.dart';
 import 'messaging/push_service.dart';
+import 'routes.dart';
 
 final rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -50,17 +51,17 @@ final routerProvider = Provider<GoRouter>((ref) {
     refreshListenable: refresh,
     redirect: (context, state) {
       final loggedIn = ref.read(authStateProvider).value ?? false;
-      final goingLogin = state.matchedLocation == '/login';
-      if (!loggedIn && !goingLogin) return '/login';
-      if (loggedIn && goingLogin) return '/';
+      final goingLogin = state.matchedLocation == Routes.login;
+      if (!loggedIn && !goingLogin) return Routes.login;
+      if (loggedIn && goingLogin) return Routes.home;
       return null;
     },
     routes: [
-      GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
-      GoRoute(path: '/', builder: (context, state) => const HomePage()),
-      GoRoute(path: '/debug', builder: (context, state) => const DebugPage()),
+      GoRoute(path: Routes.login, builder: (context, state) => const LoginPage()),
+      GoRoute(path: Routes.home, builder: (context, state) => const HomePage()),
+      GoRoute(path: Routes.debug, builder: (context, state) => const DebugPage()),
       GoRoute(
-        path: '/pengumuman/:id',
+        path: '${Routes.announcementPrefix}/:id',
         builder: (context, state) =>
             AnnouncementPage(id: state.pathParameters['id'] ?? ''),
       ),

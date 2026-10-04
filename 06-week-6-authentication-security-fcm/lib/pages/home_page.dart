@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/auth_provider.dart';
 import 'package:go_router/go_router.dart';
+import '../routes.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -15,7 +16,7 @@ class HomePage extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.bug_report),
             tooltip: 'Debug',
-            onPressed: () => context.go('/debug'),
+            onPressed: () => context.go(Routes.debug),
           ),
           IconButton(
             icon: const Icon(Icons.logout),

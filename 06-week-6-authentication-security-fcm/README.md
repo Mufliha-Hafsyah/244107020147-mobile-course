@@ -80,3 +80,14 @@ Dokumentasi lengkap (prompt, output awal AI, audit checklist, dan perbandingan d
 [docs/ai-verification.md](docs/ai-verification.md)
 
 ---
+### Refactoring Challenge
+
+#### Hasil Implementasi
+
+![Login Error setelah Refactor](screenshots/refactor-login-error.png)
+
+#### Analisis
+
+Rute yang dipusatkan ke kelas `Routes` mengurangi risiko salah ketik path dan mempermudah perubahan struktur URL di masa depan. Mapping error Dio yang dipindah ke `api_errors.dart` membuat pesan error bisa dipakai ulang tanpa duplikasi logic di halaman lain.
+
+---
