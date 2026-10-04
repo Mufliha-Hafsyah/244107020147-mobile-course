@@ -48,6 +48,14 @@
 
 Notifikasi yang berhasil masuk ke panel sistem Android saat aplikasi berjalan di background membuktikan bahwa pendaftaran token dan topik ke FCM sudah berfungsi dengan benar, serta mengonfirmasi bahwa project Firebase (package name, `google-services.json`, dan konfigurasi Gradle) sudah terpasang secara tepat.
 
+#### Uji Reinstall/Clear Data membuktikan Token Berubah
+
+| Token Sebelum Clear Data | Token Setelah Clear Data |
+|---|---|
+| ![Sebelum](screenshots/praktikum2-token-sebelum-clear.png) | ![Sesudah](screenshots/praktikum2-token-setelah-clear.png) |
+
+Data aplikasi dihapus lewat Settings > Apps > Campus Notify > Clear Data untuk mensimulasikan reinstall. Setelah aplikasi dibuka kembali dan login ulang, token FCM yang tampil di halaman Debug terbukti berbeda dari token sebelumnya, membuktikan `getToken()` berhasil mengambil registration token baru yang digenerate sistem setelah data lama dihapus.
+
 ---
 
 ### Praktikum 3: Payload, Tiga App State, Klik dan Topik
@@ -99,56 +107,41 @@ Rute yang dipusatkan ke kelas `Routes` mengurangi risiko salah ketik path dan me
 ---
 ### Checklist Verifikasi Mandiri
 
-**1. Access/refresh token disimpan di secure storage, bukan SharedPreferences.** <Br>
-`TokenStore` (`lib/data/token_store.dart`) menggunakan `flutter_secure_storage`, dibuktikan dengan unit test `token_store_test.dart` dan uji persistensi token pada Praktikum 1.
+**1. Token hanya di `flutter_secure_storage`, tidak di SharedPreferences/log/screenshot penuh.**<br>
+
+`TokenStore` (`lib/data/token_store.dart`) menggunakan `flutter_secure_storage`, dibuktikan unit test `token_store_test.dart`. Token FCM juga dipotong menjadi 12 karakter **sebelum** disimpan ke state, sehingga tidak pernah ada token penuh di memori aplikasi maupun layar. Uji clear data/reinstall pada Praktikum 2 turut membuktikan token berganti secara aman setiap kali perangkat kehilangan data lama.<br>
+
+![Token Debug](screenshots/praktikum2-token-debug.png)<br><br>
+
+**2. 401 memicu refresh sekali lalu retry; refresh mati memaksa login ulang.**<br>
+
+Diimplementasikan pada interceptor `onError` di `buildApiClient()` (`lib/data/api_client.dart`): saat menerima 401, refresh token ditukar dan request diulang satu kali. bila refresh ikut gagal, `store.clear()` dipanggil sehingga guard route memaksa pengguna login ulang.
 <br>
 
-**2. Interceptor Dio menukar refresh token otomatis saat menerima 401, dan mengulang request satu kali.**<br>
-Diimplementasikan pada `buildApiClient()` (`lib/data/api_client.dart`), lihat Praktikum 1.
-<br>
+**3. Ketiga app state teruji dengan tabel bukti; klik masuk ke rute yang benar.**<br>
 
-**3. Guard route mengarahkan ke `/login` saat pengguna belum login.**<br>
-
-| Uji | Langkah | Hasil yang Diharapkan | Hasil |
+| State | Diharapkan | Cara Uji | Hasil |
 |---|---|---|---|
-| Token bertahan | Login berhasil, tutup aplikasi total dari recent apps, buka lagi | Langsung masuk Home tanpa login ulang  | ![Uji persistensi token](screenshots/praktikum1-uji-token-bertahan.gif) |
-| Logout menghapus token | Tekan logout, tutup aplikasi total, buka lagi | Tetap di halaman Login | ![Uji persistensi token](screenshots/praktikum1-uji-logout-menghapus-token.gif) |
-<br> 
-
-**4. Token FCM ditampilkan terpotong, tidak pernah ditampilkan atau dicatat secara penuh.**<br>
-
-![Token Debug](screenshots/praktikum2-token-debug.png)
+| Foreground | Banner lokal muncul, klik masuk ke `/pengumuman/3` | Aplikasi terbuka, kirim dari Firebase Console | Berhasil |
+| Background | Banner sistem muncul, klik masuk ke rute yang benar | Tekan Home, kirim, klik notifikasi | Berhasil |
+| Terminated | Aplikasi terbuka ke rute yang benar via `getInitialMessage` | Swipe-close aplikasi, kirim, klik notifikasi | Berhasil |
 <br>
+| Foreground | Background | Terminated |
+|---|---|---|
+| ![Foreground](screenshots/praktikum3-foreground.gif) | ![Background](screenshots/praktikum3-background.gif) | ![Terminated](screenshots/praktikum3-terminated.gif) |
+<br><br>
 
-**5. Background handler berupa fungsi top-level dengan `@pragma('vm:entry-point')`.**<br>
+**4. Topik untuk broadcast, token untuk pesan personal.**<br>
 
-Diimplementasikan pada `firebaseMessagingBackgroundHandler` (`lib/messaging/push_service.dart`), lihat Praktikum 3.
-<br> 
-
-**6. Notifikasi pada tiga app state (foreground, background, terminated) teruji dengan bukti nyata.**<br>
-
-| State | Yang diharapkan | Cara uji | Hasil |
-|---|---|---|---|
-| Foreground | Banner lokal muncul, klik masuk ke `/pengumuman/3` | Aplikasi terbuka, kirim dari Firebase Console | ![Uji Foreground](screenshots/praktikum3-foreground.gif) |
-| Background | Banner sistem muncul, klik masuk ke rute yang benar | Tekan Home, kirim, klik notifikasi | ![Uji Background](screenshots/praktikum3-background.gif) |
-| Terminated | Aplikasi terbuka ke rute yang benar via `getInitialMessage` | Swipe-close aplikasi, kirim, klik notifikasi | ![Uji Terminated](screenshots/praktikum3-terminated.gif) |
-
-<br>
-
-**7. Topic messaging berfungsi.**<br>
+Subscribe ke topic `pengumuman-kampus` dilakukan otomatis pada `initFcmToken()`, dibuktikan notifikasi tetap sampai meski dikirim lewat Target: Topic di Firebase Console (bukan langsung ke device), lihat Praktikum 3.<br>
 
 | Target: Topic | Notifikasi Diterima |
 |---|---|
 | ![Topic Target](screenshots/praktikum3-topic-target.png) | ![Topic Received](screenshots/praktikum3-topic-received.png) |
-<br>
+<br><br>
 
-**8. Hasil AI Prompt Challenge diverifikasi dan didokumentasikan pada folder `docs/`.** <br>
+**5. `flutter analyze` bersih dan semua test lulus.**<br>
 
-Dokumentasi lengkap (prompt, output awal AI, audit checklist, dan perbandingan dengan implementasi manual) ada di:<br>
-[docs/ai-verification.md](docs/ai-verification.md)
-<br>
-
-**9. `flutter analyze` tanpa issue dan seluruh test lulus.**<br>
 ![Testing Passed](screenshots/testing-passed.png)
 
 ---
