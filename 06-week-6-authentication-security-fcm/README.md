@@ -141,7 +141,9 @@ Diimplementasikan pada interceptor `onError` di `buildApiClient()` (`lib/data/ap
 | Foreground | Banner lokal muncul, klik masuk ke `/pengumuman/3` | Aplikasi terbuka, kirim dari Firebase Console | Berhasil |
 | Background | Banner sistem muncul, klik masuk ke rute yang benar | Tekan Home, kirim, klik notifikasi | Berhasil |
 | Terminated | Aplikasi terbuka ke rute yang benar via `getInitialMessage` | Swipe-close aplikasi, kirim, klik notifikasi | Berhasil |
+
 <br>
+
 | Foreground | Background | Terminated |
 |---|---|---|
 | ![Foreground](screenshots/praktikum3-foreground.gif) | ![Background](screenshots/praktikum3-background.gif) | ![Terminated](screenshots/praktikum3-terminated.gif) |
