@@ -91,3 +91,10 @@ Dokumentasi lengkap (prompt, output awal AI, audit checklist, dan perbandingan d
 Rute yang dipusatkan ke kelas `Routes` mengurangi risiko salah ketik path dan mempermudah perubahan struktur URL di masa depan. Mapping error Dio yang dipindah ke `api_errors.dart` membuat pesan error bisa dipakai ulang tanpa duplikasi logic di halaman lain.
 
 ---
+
+### Testing
+
+**Hasil:**<br>
+![Testing Passed](screenshots/testing-passed.png)
+
+---
