@@ -152,3 +152,88 @@ Dokumentasi lengkap (prompt, output awal AI, audit checklist, dan perbandingan d
 ![Testing Passed](screenshots/testing-passed.png)
 
 ---
+### Mini Project: Campus Notification App
+
+Seluruh requirement mini project sudah terpenuhi melalui pengerjaan praktikum dan tantangan di atas:<br>
+
+**1. Login (mock/Firebase Auth) dengan guard route: belum login selalu diarahkan ke /login.**<br>
+
+Diimplementasikan pada `AuthRepository` dan `GoRouter.redirect`, dibuktikan lewat uji tutup-buka aplikasi pada Praktikum 1 (lihat Checklist poin 1 dan 3).<br>
+
+**2.Token disimpan di secure storage; Dio otomatis refresh sekali saat 401 dan logout bila refresh mati.**<br>
+
+`TokenStore` menggunakan `flutter_secure_storage`. Interceptor pada `buildApiClient()` menukar refresh token saat 401 dan mengulang request satu kali. Bila refresh ikut gagal, seluruh token dihapus lewat `store.clear()`. Perilaku ini diuji lewat unit test interceptor (di bagian testing).<br>
+
+**3. FCM terintegrasi: permission, getToken + onTokenRefresh terkirim ke backend (atau didokumentasikan endpoint POST /devices), dan subscribe topik pengumuman-kampus.**<br>
+
+`initFcmToken()` (`lib/messaging/push_service.dart`) meminta izin notifikasi, mengambil token awal, mendaftarkan listener `onTokenRefresh`, dan subscribe topic. Endpoint backend sungguhan belum tersedia (mock project), sehingga pengiriman token ditandai sebagai `TODO: kirim token ke backend sungguhan` dengan endpoint yang didokumentasikan sebagai `POST /devices` pada `main.dart`.
+<br>
+
+**4. Notifikasi gabungan notification + data; klik membuka /pengumuman/:id pada ketiga app state. Isi tabel pengujian foreground/background/terminated di README.**<br>
+| State | Diharapkan | Cara Uji | Hasil |
+|---|---|---|---|
+| Foreground | Banner lokal muncul, klik masuk ke `/pengumuman/3` | Aplikasi terbuka, kirim dari Firebase Console | Berhasil |
+| Background | Banner sistem muncul, klik masuk ke rute yang benar | Tekan Home, kirim, klik notifikasi | Berhasil |
+| Terminated | Aplikasi terbuka ke rute yang benar via `getInitialMessage` | Swipe-close aplikasi, kirim, klik notifikasi | Berhasil |
+
+<br>
+
+| Foreground | Background | Terminated |
+|---|---|---|
+| ![Foreground](screenshots/praktikum3-foreground.gif) | ![Background](screenshots/praktikum3-background.gif) | ![Terminated](screenshots/praktikum3-terminated.gif) |
+
+**5. Screenshot bukti (token terpotong, banner tiap state, halaman tujuan deep link) di folder screenshots/.**<br>
+
+| Token Terpotong | Notifikasi Masuk | Halaman Tujuan Deep Link |
+|---|---|---|
+| ![Token Debug](screenshots/praktikum2-token-debug.png) | ![FCM Console Test](screenshots/fcm-console-test.png) | ![Announcement](screenshots/praktikum3-topic-received.png) |
+
+Bukti lengkap untuk tiap app state (foreground, background, terminated) berupa rekaman, dapat dilihat pada Praktikum 3.<br><br>
+
+**6. Sertakan minimal 2 test yang lulus (parsing route + logika sesi/refresh).**<br>
+
+5 unit test pada `test/push_service_test.dart` (parsing `routeFromMessage`) dan `test/token_store_test.dart` (penyimpanan dan penghapusan token), lihat bagian Testing.
+<br>
+
+**7. Hasil AI Prompt Challenge terdokumentasi.**<br>
+
+Lihat [`docs/ai-verification.md`](docs/ai-verification.md).<br>
+
+**8. Push ke repository portfolio pada folder 06-week-6-authentication-security-fcm/ dengan struktur lib/, test/, docs/, README.md, dan screenshots/. README menjelaskan tujuan, fitur utama, stack teknologi, cara menjalankan, dan hasil yang dicapai.**<br>
+
+Project ditempatkan di `06-week-6-authentication-security-fcm/` dengan struktur `lib/`, `test/`, `docs/`, `screenshots/`, dan `README.md` ini.
+
+#### Cara Menjalankan
+
+```bash
+cd 06-week-6-authentication-security-fcm
+flutter pub get
+flutter run
+```
+<br>
+Catatan: project ini membutuhkan file `android/app/google-services.json` dari project Firebase masing-masing untuk fitur FCM berfungsi. File ini sengaja tidak disertakan di repository karena bersifat sensitif.
+
+---
+## Refleksi
+
+**1. Mengapa refresh token tidak boleh disimpan di SharedPreferences? Apa risikonya bila bocor?**<br>
+
+Jawaban:<br>
+SharedPreferences menyimpan data dalam file XML biasa yang tidak terenkripsi, jadi kalau perangkat di-root atau diakses orang lain, isinya bisa langsung dibaca. Refresh token itu kredensial yang umurnya panjang dan bisa dipakai berkali-kali untuk minta access token baru, jadi kalau bocor, penyerang bisa terus menyamar jadi pengguna dalam waktu lama tanpa perlu login ulang atau tahu password, bahkan setelah access token lamanya kedaluwarsa. `flutter_secure_storage` menyimpan data terenkripsi lewat Keystore Android, sehingga jauh lebih sulit diambil.<br><br>
+
+**2. Apa yang rusak bila `onTokenRefresh` diabaikan selama satu semester perkuliahan?**<br>
+
+Jawaban:<br>
+Token FCM bisa berubah kapan saja, misalnya saat aplikasi di-reinstall, data aplikasi dihapus, atau ada rotasi token oleh sistem. Kalau listener `onTokenRefresh` tidak ada, backend kampus tetap menyimpan token lama yang sudah tidak valid, sehingga notifikasi pengumuman yang dikirim ke mahasiswa tersebut tidak akan pernah sampai lagi, padahal dari sisi aplikasi sepertinya semua baik-baik saja karena tidak ada error yang muncul. Selama satu semester, ini bisa berarti banyak mahasiswa diam-diam berhenti menerima notifikasi tanpa ada yang menyadarinya sampai ada yang komplain ketinggalan pengumuman penting.<br><br>
+
+**3. Kapan memakai topik dan kapan memakai token perangkat? Beri contoh pesan kampus untuk masing-masing.**<br>
+
+Jawaban:<br>
+Topic cocok dipakai untuk pesan broadcast yang ditujukan ke banyak orang sekaligus tanpa perlu tahu device masing-masing, misalnya pengumuman libur kampus atau perubahan jadwal UTS yang berlaku untuk semua mahasiswa yang subscribe topic `pengumuman-kampus`. Token perangkat dipakai untuk pesan personal yang hanya relevan untuk satu pengguna tertentu, misalnya notifikasi "Nilai UAS Pemrograman Mobile Anda sudah keluar" atau "Tagihan UKT Anda belum dibayar", yang jelas tidak boleh dikirim ke semua orang lewat topic.<br><br>
+
+**4. Bagian mana dari draf AI yang Anda tolak atau perbaiki, dan mengapa?**<br>
+
+Jawaban:<br>
+Draf `PushService` dari AI diverifikasi pakai AI Verification Checklist dan gagal di 5 dari 6 poin, sehingga ditolak seluruhnya dan tidak dipakai di project. Masalah utamanya: background handler ditulis sebagai method kelas tanpa `@pragma('vm:entry-point')`, `onTokenRefresh` cuma `print()` tanpa kirim ke backend, tidak ada listener `onMessage` sama sekali sehingga notifikasi tidak tampil saat foreground, fungsi navigasi kosong, dan token lengkap dicetak ke log. Karena tingkat kegagalannya tinggi, bukan draf ini yang diperbaiki, melainkan didokumentasikan sebagai perbandingan terhadap implementasi manual pada Praktikum 1–3 yang sejak awal sudah menghindari seluruh masalah tersebut.
+
+---
