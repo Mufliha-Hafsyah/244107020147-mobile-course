@@ -81,3 +81,46 @@ Struktur mengikuti modul untuk fitur `notes`. `router.dart` tetap di `lib/` kare
 Widget sudah bersih dari akses jaringan dan database (pencarian 1 dan 2 nol hasil). Pelanggarannya ada di pembuatan repository secara manual di folder presentation dan di arah dependensi yang terbalik: `sync.dart` mengimpor `pages/`, sementara `note_tile.dart` mengimpor `data/`. Targetnya, tiga pencarian modul tetap nol hasil setelah Praktikum 3, dan tidak ada lagi import data ke presentation maupun presentation ke data di luar wiring provider.
 
 ---
+### Praktikum 2: Domain dan Data Per Fitur
+
+#### File yang Dibuat
+
+```
+lib/
+├── core/
+│   └── failures.dart
+└── features/
+    └── notes/
+        ├── domain/
+        │   ├── entities/note.dart
+        │   ├── repositories/note_repository.dart   # interface
+        │   └── usecases/get_notes.dart, sync_notes.dart
+        └── data/
+            ├── models/note_model.dart
+            └── repositories/note_repository_impl.dart
+```
+
+Kode lama (`data/local/note.dart`, `data/repositories/note_repository.dart`, `data/sync.dart`) belum dihapus. Keduanya sementara berdampingan dan baru diganti pada Praktikum 3.
+
+#### Penyesuaian dari Modul
+
+- **Interface repository diperluas.** Modul hanya memuat `fetchNotes` dan `addNote`. Aplikasi ini juga punya hapus catatan, hitung catatan belum sinkron, dan tandai tersinkron. Ketiganya (`deleteNote`, `countDirty`, `markAllSynced`) ditambahkan dengan pola kontrak yang sama agar perilaku tetap identik.
+- **Use case `SyncNotes` ditambahkan.** Logika `syncNotes` yang sebelumnya ada di `data/sync.dart` dipindah ke domain. Isinya menggabungkan dua operasi repository dan punya aturan sendiri: berhenti bila tidak ada catatan yang belum sinkron.
+- **Use case `AddNote` tidak dibuat.** Struktur pada modul mencantumkan `add_note.dart`, tetapi teks modul menyebut CRUD satu baris cukup lewat repository langsung. Karena itu `addNote` dan `deleteNote` dipanggil langsung dari notifier.
+- **Konstruktor `NoteRepositoryImpl`** memakai `this._openDb` mengikuti saran analyzer (`prefer_initializing_formals`), berbeda dari penulisan pada modul.
+- **`db.dart` tetap di `lib/data/local/`.**
+- **Cache posts belum diubah.** Penanganannya dicatat pada Refactoring Challenge.
+
+#### Hasil Implementasi
+
+`flutter analyze` pada tahap ini: **No issues found!**
+
+![Analyze Praktikum 2](screenshots/praktikum2-analyze.png)
+
+#### Analisis
+
+Entity `Note` kini murni tanpa mapping, sedangkan `toMap` dan `fromMap` hanya ada di `NoteModel` yang mengubah kembali datanya menjadi entity lewat `toEntity()`. Repository mengembalikan record `(data, failure)` sehingga kegagalan SQLite menjadi `LocalFailure` dan tidak bocor sebagai exception ke lapisan di atasnya.<br>
+
+`GetNotes` hanya meneruskan hasil repository. `SyncNotes` dipisah sebagai use case karena menggabungkan beberapa operasi dan punya aturan sendiri, sedangkan tambah dan hapus catatan cukup lewat repository langsung.
+
+---
