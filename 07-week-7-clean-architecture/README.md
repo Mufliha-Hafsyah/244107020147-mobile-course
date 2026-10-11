@@ -177,3 +177,10 @@ Pelanggaran terbesar sebelum refactor ada pada arah dependensi dan pembuatan rep
 Perilaku aplikasi tidak berubah, terlihat dari enam screenshot yang sama persis sebelum dan sesudah refactor (daftar catatan, badge belum sinkron, cache posts, hapus catatan, detail catatan, dan dark mode).
 
 ---
+### AI Prompt Challenge
+
+Dokumentasi lengkap (prompt, output awal AI, audit checklist, dan perbandingan dengan implementasi manual) ada di:
+
+[docs/ai-verification.md](docs/ai-verification.md)
+
+---
