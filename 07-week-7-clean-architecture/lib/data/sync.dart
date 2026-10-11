@@ -1,6 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../pages/notes_page.dart';
 import 'repositories/note_repository.dart';
+
+// SEMENTARA: repository lama masih dipakai khusus cache posts.
+// Dirapikan pada Refactoring Challenge (fitur cache posts).
+final postCacheRepositoryProvider =
+    Provider<NoteRepository>((ref) => NoteRepository());
 
 final cachedPostsProvider =
     AsyncNotifierProvider<CachedPostsNotifier, List<Map<String, dynamic>>>(
@@ -9,7 +13,7 @@ final cachedPostsProvider =
 class CachedPostsNotifier extends AsyncNotifier<List<Map<String, dynamic>>> {
   @override
   Future<List<Map<String, dynamic>>> build() async {
-    final repository = ref.watch(noteRepositoryProvider);
+    final repository = ref.watch(postCacheRepositoryProvider);
     final cached = await repository.readCachedPosts();
     _refreshInBackground(repository);
 
@@ -26,12 +30,4 @@ class CachedPostsNotifier extends AsyncNotifier<List<Map<String, dynamic>>> {
       // data cache yang sudah ditampilkan tetap valid untuk dipakai.
     }
   }
-}
-
-Future<int> syncNotes(NoteRepository repo) async {
-  final dirtyCount = await repo.countDirty();
-  if (dirtyCount == 0) return 0;
-  await Future.delayed(const Duration(seconds: 1));
-  await repo.markAllSynced();
-  return dirtyCount;
 }

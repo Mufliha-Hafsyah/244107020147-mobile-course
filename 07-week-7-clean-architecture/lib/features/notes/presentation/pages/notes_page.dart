@@ -1,37 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../data/local/note.dart';
-import '../data/repositories/note_repository.dart';
-import '../data/sync.dart';
-import 'widgets/note_tile.dart';
 import 'package:go_router/go_router.dart';
-
-final noteRepositoryProvider = Provider<NoteRepository>((ref) => NoteRepository());
-
-final notesProvider = AsyncNotifierProvider<NotesNotifier, List<Note>>(NotesNotifier.new);
-
-class NotesNotifier extends AsyncNotifier<List<Note>> {
-  @override
-  Future<List<Note>> build() async {
-    final repository = ref.watch(noteRepositoryProvider);
-    return repository.fetchNotes();
-  }
-
-  Future<void> addNote(String title) async {
-    await ref.read(noteRepositoryProvider).addNote(title: title);
-    ref.invalidateSelf();
-  }
-
-  Future<void> deleteNote(int id) async {
-    await ref.read(noteRepositoryProvider).deleteNote(id);
-    ref.invalidateSelf();
-  }
-}
-
-final dirtyCountProvider = FutureProvider<int>((ref) {
-  ref.watch(notesProvider); // rebuild otomatis saat notes berubah
-  return ref.watch(noteRepositoryProvider).countDirty();
-});
+import '../providers/notes_providers.dart';
+import '../widgets/note_tile.dart';
 
 class NotesPage extends ConsumerWidget {
   const NotesPage({super.key});
@@ -52,16 +23,16 @@ class NotesPage extends ConsumerWidget {
             IconButton(
               icon: const Icon(Icons.sync),
               onPressed: () async {
-              final repository = ref.read(noteRepositoryProvider);
-              final synced = await syncNotes(repository);
-              ref.invalidate(notesProvider);
-              ref.invalidate(dirtyCountProvider);
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('$synced catatan berhasil disinkron')),
-                );
-              }
-            },
+                final result = await ref.read(syncNotesProvider).call();
+                ref.invalidate(notesProvider);
+                ref.invalidate(dirtyCountProvider);
+                if (context.mounted) {
+                  final message = result.failure?.message ??
+                      '${result.synced} catatan berhasil disinkron';
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text(message)));
+                }
+              },
           ),
           dirtyCountAsync.when(
             loading: () => const SizedBox.shrink(),

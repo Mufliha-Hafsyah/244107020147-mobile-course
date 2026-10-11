@@ -124,3 +124,56 @@ Entity `Note` kini murni tanpa mapping, sedangkan `toMap` dan `fromMap` hanya ad
 `GetNotes` hanya meneruskan hasil repository. `SyncNotes` dipisah sebagai use case karena menggabungkan beberapa operasi dan punya aturan sendiri, sedangkan tambah dan hapus catatan cukup lewat repository langsung.
 
 ---
+### Praktikum 3: Presentation, DI, dan Verifikasi
+
+#### Perubahan yang Dilakukan
+
+- **DI terpusat** di `features/notes/presentation/providers/notes_providers.dart`: `noteRepositoryProvider` membuat `NoteRepositoryImpl(openDb: openNotesDb)`, lalu `getNotesProvider` dan `syncNotesProvider` menerima abstraksi `NoteRepository`.
+- **Halaman notes dipindah** ke `features/notes/presentation/` (`notes_page.dart`, `note_detail_page.dart`, `widgets/note_tile.dart`). `router.dart` hanya diubah bagian importnya.
+- **`sync.dart` tidak lagi mengimpor `pages/`.** Fungsi `syncNotes` digantikan use case `SyncNotes`, dan tombol sync di `NotesPage` memanggil `syncNotesProvider`.
+- **Test diadaptasi.** `test/note_test.dart` memakai `NoteModel` dan fake yang mengimplementasikan interface baru. `test/get_notes_test.dart` ditambahkan (use case sukses dan failure).
+
+#### Verifikasi Dependency Rule
+
+Perintah `rg` pada modul diganti `Get-ChildItem -Recurse | Select-String` (PowerShell) dengan pola yang sama.
+
+| Pemeriksaan | Sebelum | Sesudah | Target modul |
+|---|---|---|---|
+| 1. Presentation steril dari data mentah | 0 hasil | 0 hasil | 0 hasil |
+| 2. Domain steril dari framework dan package | belum ada domain | 0 hasil | 0 hasil |
+| 3. Repository dibuat manual di `lib/pages` | 2 hasil | 1 hasil | 0 hasil |
+| 4. Data mengimpor presentation (tambahan) | 1 hasil | 0 hasil | 0 hasil |
+
+Pemeriksaan 3 masih menyisakan satu hasil, belum mencapai target nol:
+
+```
+lib\pages\settings_page.dart:5:final prefsRepositoryProvider = Provider((ref) => PrefsRepository());
+```
+
+Repository preferensi masih dibuat langsung di folder `pages`. Ini ditangani pada Refactoring Challenge saat fitur `settings` dipisah ke layer.<br>
+
+`flutter analyze` pada tahap ini: No issues found!, dan`flutter test`: all test passed.<br> 
+
+![Analyze Praktikum 3](screenshots/praktikum3-analyze-test.png)
+
+#### Hasil Implementasi
+
+Aplikasi diuji ulang dan tampilannya sama dengan sebelum refactor.
+
+| | Catatan Tersinkron | Badge Belum Sinkron | Cache Posts |
+|---|---|---|---|
+| Before | ![Before synced](screenshots/before-notes-synced.png) | ![Before dirty](screenshots/before-notes-dirty.png) | ![Before cache](screenshots/before-cache-posts.png) |
+| After | ![After synced](screenshots/after-notes-synced.png) | ![After dirty](screenshots/after-notes-dirty.png) | ![After cache](screenshots/after-cache-posts.png) |
+
+| | Hapus Catatan | Detail Catatan | Dark Mode |
+|---|---|---|---|
+| Before | ![Before deleted](screenshots/before-notes-deleted.png) | ![Before detail](screenshots/before-note-detail.png) | ![Before dark](screenshots/before-dark-mode.png) |
+| After | ![After deleted](screenshots/after-notes-deleted.png) | ![After detail](screenshots/after-note-detail.png) | ![After dark](screenshots/after-dark-mode.png) |
+
+#### Analisis
+
+Pelanggaran terbesar sebelum refactor ada pada arah dependensi dan pembuatan repository secara manual, bukan pada widget. Sekarang repository hanya dibuat di satu tempat (`notes_providers.dart`), `sync.dart` tidak lagi bergantung ke presentation, dan domain bebas dari import framework.<br>
+
+Perilaku aplikasi tidak berubah, terlihat dari enam screenshot yang sama persis sebelum dan sesudah refactor (daftar catatan, badge belum sinkron, cache posts, hapus catatan, detail catatan, dan dark mode).
+
+---
