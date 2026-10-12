@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/notes_providers.dart'; 
+import '../../../../core/failures.dart';
 
 class NoteDetailPage extends ConsumerWidget {
   const NoteDetailPage({super.key, required this.noteId});
@@ -15,7 +16,7 @@ class NoteDetailPage extends ConsumerWidget {
       appBar: AppBar(title: const Text('Detail Catatan')),
       body: notesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => Center(child: Text('Gagal memuat: $err')),
+        error: (err, _) => Center(child: Text(messageFromError(err))),
         data: (notes) {
           final matches = notes.where((n) => n.id == noteId);
           if (matches.isEmpty) {

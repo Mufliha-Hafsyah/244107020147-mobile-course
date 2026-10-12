@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../core/format.dart';
 
 class MainShell extends StatelessWidget {
   const MainShell({super.key, required this.child});
@@ -9,7 +10,7 @@ class MainShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
-    final index = location.startsWith('/posts') ? 1 : 0;
+    final index = tabIndexForLocation(location);
 
     return Scaffold(
       body: child,

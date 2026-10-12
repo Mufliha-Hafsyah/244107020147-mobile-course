@@ -1,9 +1,10 @@
 import 'package:go_router/go_router.dart';
 import 'features/notes/presentation/pages/notes_page.dart';
 import 'features/notes/presentation/pages/note_detail_page.dart';
-import 'pages/posts_cache_page.dart';
-import 'pages/settings_page.dart';
+import 'features/posts/presentation/pages/posts_cache_page.dart';
+import 'features/settings/presentation/pages/settings_page.dart';
 import 'pages/main_shell.dart';
+import 'core/format.dart';
 
 final router = GoRouter(
   initialLocation: '/',
@@ -18,7 +19,7 @@ final router = GoRouter(
     GoRoute(
       path: '/note/:id',
       builder: (context, state) {
-        final id = int.parse(state.pathParameters['id']!);
+        final id = parseNoteId(state.pathParameters['id']!);
         return NoteDetailPage(noteId: id);
       },
     ),

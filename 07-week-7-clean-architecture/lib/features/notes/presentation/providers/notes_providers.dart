@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/failures.dart';
 import '../../../../data/local/db.dart';
 import '../../data/repositories/note_repository_impl.dart';
 import '../../domain/entities/note.dart';
@@ -28,7 +29,7 @@ class NotesNotifier extends AsyncNotifier<List<Note>> {
   @override
   Future<List<Note>> build() async {
     final result = await ref.watch(getNotesProvider).call();
-    if (result.failure != null) throw Exception(result.failure!.message);
+    if (result.failure != null) throw FailureException(result.failure!);
     return result.notes;
   }
 
@@ -37,7 +38,8 @@ class NotesNotifier extends AsyncNotifier<List<Note>> {
     final result =
         await ref.read(noteRepositoryProvider).addNote(title: title);
     if (result.failure != null) {
-      state = AsyncError(Exception(result.failure!.message), StackTrace.current);
+      state = AsyncError(
+          FailureException(result.failure!), StackTrace.current);
       return;
     }
     ref.invalidateSelf();
@@ -46,7 +48,7 @@ class NotesNotifier extends AsyncNotifier<List<Note>> {
   Future<void> deleteNote(int id) async {
     final failure = await ref.read(noteRepositoryProvider).deleteNote(id);
     if (failure != null) {
-      state = AsyncError(Exception(failure.message), StackTrace.current);
+      state = AsyncError(FailureException(failure), StackTrace.current);
       return;
     }
     ref.invalidateSelf();
@@ -56,6 +58,6 @@ class NotesNotifier extends AsyncNotifier<List<Note>> {
 final dirtyCountProvider = FutureProvider<int>((ref) async {
   ref.watch(notesProvider); // rebuild otomatis saat notes berubah
   final result = await ref.watch(noteRepositoryProvider).countDirty();
-  if (result.failure != null) throw Exception(result.failure!.message);
+  if (result.failure != null) throw FailureException(result.failure!);
   return result.count;
 });

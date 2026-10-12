@@ -19,7 +19,7 @@ class NoteRepositoryImpl implements NoteRepository {
     } catch (e) {
       return (
         notes: const <Note>[],
-        failure: LocalFailure('Gagal membaca catatan: $e'),
+        failure: LocalFailure('Gagal membaca catatan. Coba lagi.', cause: e),
       );
     }
   }
@@ -43,7 +43,10 @@ class NoteRepositoryImpl implements NoteRepository {
         failure: null,
       );
     } catch (e) {
-      return (note: null, failure: LocalFailure('Gagal menyimpan catatan: $e'));
+      return (
+        note: null,
+        failure: LocalFailure('Gagal menyimpan catatan. Coba lagi.', cause: e),
+      );
     }
   }
 
@@ -54,7 +57,7 @@ class NoteRepositoryImpl implements NoteRepository {
       await db.delete('notes', where: 'id = ?', whereArgs: [id]);
       return null;
     } catch (e) {
-      return LocalFailure('Gagal menghapus catatan: $e');
+      return LocalFailure('Gagal menghapus catatan. Coba lagi.', cause: e);
     }
   }
 
@@ -68,7 +71,7 @@ class NoteRepositoryImpl implements NoteRepository {
     } catch (e) {
       return (
         count: 0,
-        failure: LocalFailure('Gagal menghitung catatan belum sinkron: $e'),
+        failure: LocalFailure('Gagal menghitung catatan belum sinkron.', cause: e),
       );
     }
   }
@@ -80,7 +83,7 @@ class NoteRepositoryImpl implements NoteRepository {
       await db.update('notes', {'dirty': 0}, where: 'dirty = 1');
       return null;
     } catch (e) {
-      return LocalFailure('Gagal menandai catatan tersinkron: $e');
+      return LocalFailure('Gagal menandai catatan tersinkron.', cause: e);
     }
   }
 }

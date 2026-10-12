@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/notes_providers.dart';
 import '../widgets/note_tile.dart';
+import '../../../../core/failures.dart';
 
 class NotesPage extends ConsumerWidget {
   const NotesPage({super.key});
@@ -48,7 +49,7 @@ class NotesPage extends ConsumerWidget {
       ),
       body: notesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => Center(child: Text('Gagal memuat: $err')),
+        error: (err, _) => Center(child: Text(messageFromError(err))),
         data: (notes) => notes.isEmpty
             ? const Center(child: Text('Belum ada catatan.'))
             : ListView.builder(

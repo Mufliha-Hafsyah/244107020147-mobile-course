@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../data/sync.dart';
+
+import '../../../../core/failures.dart';
+import '../providers/posts_providers.dart';
 
 class PostsCachePage extends ConsumerWidget {
   const PostsCachePage({super.key});
@@ -13,17 +15,18 @@ class PostsCachePage extends ConsumerWidget {
       appBar: AppBar(title: const Text('Posts (Cache-First)')),
       body: postsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => Center(child: Text('Gagal memuat: $err')),
+        error: (err, _) => Center(child: Text(messageFromError(err))),
         data: (posts) => posts.isEmpty
-            ? const Center(child: Text('Belum ada cache. Sambungkan internet dulu.'))
+            ? const Center(
+                child: Text('Belum ada cache. Sambungkan internet dulu.'))
             : ListView.builder(
                 itemCount: posts.length,
                 itemBuilder: (context, index) {
                   final post = posts[index];
                   return ListTile(
-                    leading: CircleAvatar(child: Text('${post['id']}')),
+                    leading: CircleAvatar(child: Text('${post.id}')),
                     title: Text(
-                      post['title'] as String? ?? '',
+                      post.title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),

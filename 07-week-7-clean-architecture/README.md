@@ -12,6 +12,26 @@
 
 ## JOBSHEET WEEK 7 Clean Architecture
 
+Project ini adalah refactor dari project Minggu 5 (`week5_offline_notes`) menjadi struktur **feature-first Clean Architecture**. Tidak ada fitur baru yang ditambahkan; yang berubah adalah letak kode dan arah dependensinya. Titik awal refactor adalah commit snapshot `dca847f`.
+
+**Stack:** Flutter, Riverpod, GoRouter, sqflite, shared_preferences, Dio.
+
+**Fitur utama:** notes (CRUD offline, badge belum sinkron, sinkronisasi), posts (cache-first), dan settings (mode gelap).
+
+#### Diagram layer dan arah dependensi
+
+```
+presentation (pages, widgets, providers + DI)
+      |
+      v  bergantung ke
+domain (entity, repository interface, use case)  <-- core/failures.dart
+      ^
+      |  diimplementasikan oleh
+data (model, repository impl, db.dart, prefs.dart, Dio)
+```
+
+Dependensi hanya mengarah ke dalam. `domain` tidak mengimpor Flutter, Dio, sqflite, maupun layer lain.
+
 ---
 ### Praktikum 1: Audit layer project lama
 
@@ -179,8 +199,122 @@ Perilaku aplikasi tidak berubah, terlihat dari enam screenshot yang sama persis 
 ---
 ### AI Prompt Challenge
 
-Dokumentasi lengkap (prompt, output awal AI, audit checklist, dan perbandingan dengan implementasi manual) ada di:
+Dokumentasi lengkap (prompt, output awal AI, verifikasi dengan checklist, hasil grep dependency rule, dan perbandingan usulan AI dengan keputusan akhir) ada di:
 
 [docs/ai-verification.md](docs/ai-verification.md)
+
+---
+### Refactoring Challenge
+
+Tiga poin dikerjakan, dengan satu penyimpangan yang dicatat:
+
+1. **Fitur kedua `settings` (dan pembersihan cache `posts`).** Jobsheet menyebut `auth`/`announcements`, tetapi project Minggu 5 tidak memilikinya, sehingga fitur kedua adalah `settings` (entity, repository interface + impl, use case `ToggleDarkMode`, provider, halaman). Cache `posts` ikut dipindahkan karena modul berpesan tidak boleh ada satu fitur bersih dan sisanya kotor. File lama dihapus: `data/sync.dart`, `data/repositories/note_repository.dart`, `data/local/cached_post.dart`, `data/local/note.dart`, `pages/settings_page.dart`, `pages/posts_cache_page.dart`.
+2. **`lib/core/format.dart`:** `parseNoteId` (dari `router.dart`) dan `tabIndexForLocation` (dari `main_shell.dart`), diuji tanpa widget di `test/format_test.dart`. **Penyimpangan:** modul menyebut "formatting tanggal dan parsing rute", tetapi project tidak punya formatting tanggal di UI (pencarian `DateFormat|toIso8601String` pada kode halaman tidak menemukan apa pun). Membuatnya berarti menambah fitur, yang dilarang modul, sehingga hanya parsing rute yang diekstrak.
+3. **Exception mentah menjadi `Failure` ramah pengguna.** Pesan seperti `'Gagal membaca catatan: $e'` kini `'Gagal membaca catatan. Coba lagi.'` dengan penyebab asli di `cause`. Provider notes memakai `FailureException` (bukan `Exception`), dan UI memanggil `messageFromError(err)`, sehingga awalan "Exception:" tidak lagi muncul di layar.
+
+#### Hasil Implementasi (before/after)
+
+| Layar | Before | After |
+|---|---|---|
+| Daftar catatan | ![Before](screenshots/notes-list-before.png) | ![After](screenshots/notes-list-after.png) |
+| Detail catatan | ![Before](screenshots/notes-detail-before.png) | ![After](screenshots/notes-detail-after.png) |
+| Posts (online) | ![Before](screenshots/posts-online-before.png) | ![After](screenshots/posts-online-after.png) |
+| Posts (offline, dari cache) | ![Before](screenshots/posts-offline-before.png) | ![After](screenshots/posts-offline-after.png) |
+| Pengaturan (mode terang) | ![Before](screenshots/settings-light-before.png) | ![After](screenshots/settings-light-after.png) |
+| Pengaturan (mode gelap) | ![Before](screenshots/settings-dark-before.png) | ![After](screenshots/settings-dark-after.png) |
+
+#### Analisis
+
+Tampilan sebelum dan sesudah identik, sesuai tujuan refactor. Satu-satunya perubahan perilaku ditemukan saat memindahkan fitur `posts`: pada kode lama, `_refreshInBackground` memanggil `ref.invalidateSelf()`, yang memicu `build()` dan refresh lagi secara berulang selama ada internet. Versi baru mengisi `state` langsung, sehingga refresh hanya terjadi sekali per pembukaan halaman.<Br>
+
+Beberapa trade-off yang disengaja: entity `AppSettings` untuk satu boolean berlebihan secara teknis, tetapi dibuat agar fitur kedua mengikuti pola lengkap sesuai modul; fitur `posts` tidak punya use case karena hanya meneruskan panggilan; dan `PrefsRepository` tidak diubah agar key `dark_mode` tetap sama sehingga preferensi lama tidak hilang. `markOpenedNow` dan `getLastOpened` di `prefs.dart` tidak dipakai di mana pun, tetapi tidak dihapus karena kode mati bawaan itu di luar lingkup tiga poin challenge.
+
+---
+### Testing
+
+Tujuh test lulus pada tiga file:
+
+1. **`test/get_notes_test.dart`:** `GetNotes` meneruskan daftar dari repository palsu, dan meneruskan `Failure` tanpa melempar exception. Domain diuji murni, tanpa SQLite maupun Dio.
+2. **`test/note_test.dart`:** `fromMap` aman terhadap field yang hilang, flag `dirty` bertahan pada serialisasi, dan provider sukses dengan repository palsu (dari Minggu 5, disesuaikan ke struktur baru).
+3. **`test/format_test.dart`:** `parseNoteId` membaca id dari string, dan `tabIndexForLocation` memilih tab yang tepat untuk rute `/posts` dan `/`.
+
+**Hasil:**<br>
+![Testing](screenshots/flutter-analyze-test.png)
+
+---
+
+### Checklist Verifikasi Mandiri
+
+**1. Tiga grep sterilitas (presentation dan domain) nol hasil.**<br>
+Ketiga grep nol hasil setelah refactor, berbeda dari sebelum refactor yang menemukan dua kasus DI bocor.
+
+| Sebelum refactor (2 temuan) | Sesudah: presentation | Sesudah: domain | Sesudah: instansiasi di halaman |
+|---|---|---|---|
+| ![Sebelum](screenshots/grep-sebelum-refactor.png) | ![Presentation](screenshots/grep-sesudah-1-presentation.png) | ![Domain](screenshots/grep-sesudah-2-domain.png) | ![Instansiasi](screenshots/grep-sesudah-3-instansiasi.png) |
+
+**2. Interface di domain, implementasi di data, mapping hanya di model.**<br>
+Interface repository ada di `features/*/domain/repositories/`, implementasinya di `features/*/data/repositories/*_impl.dart`. Grep `toMap|fromMap|toJson|fromJson` pada folder `domain` nol hasil; mapping hanya ada di `data/models`.
+
+| Struktur folder | Grep entity bebas mapping |
+|---|---|
+| ![Struktur](screenshots/struktur-folder.png) | ![Grep mapping](screenshots/grep-sesudah-4-mapping.png) |
+
+**3. Widget tidak menginstansiasi repository; semua lewat provider.**<br>
+Grep `Repository\(|RepositoryImpl\(` pada `presentation/pages` dan `presentation/widgets` nol hasil. Pembuatan objek konkret hanya ada di `presentation/providers`.
+
+| Grep halaman dan widget fitur |
+|---|
+| ![Grep widget](screenshots/grep-sesudah-5-widget.png) |
+
+**4. Aplikasi berjalan identik sebelum/sesudah refactor (bukti screenshot).**<br>
+Lihat tabel before/after di bagian Refactoring Challenge (daftar catatan, detail, posts online dan offline, serta pengaturan mode terang dan gelap).<br>
+
+**5. `flutter analyze` bersih dan semua test lulus.**<br>
+![Analyze dan test](screenshots/flutter-analyze-test.png)
+
+---
+
+### Mini Project: Refactor ke Clean Architecture
+
+Seluruh requirement mini project sudah terpenuhi:
+
+1. **Fitur penuh terpisah menjadi domain, data, dan presentation:** `notes`, `posts`, dan `settings` (tiga fitur, melebihi minimal satu).
+2. **Dependency rule terbukti:** hasil grep sterilitas ada di bagian Praktikum 3, Checklist poin 1 sampai 3, dan [docs/ai-verification.md](docs/ai-verification.md).
+3. **Behavior identik:** screenshot before/after tiap fitur ada di tabel Refactoring Challenge.
+4. **Minimal 2 test yang lulus:** tujuh test lulus (use case sukses dan failure dengan repository palsu, mapping model, dan fungsi di `core/format.dart`).
+5. **AI Challenge terdokumentasi:** prompt, output AI, tabel usulan-vs-keputusan, dan hasil grep di [docs/ai-verification.md](docs/ai-verification.md).
+6. **Struktur folder sesuai portofolio:** `07-week-7-clean-architecture/` berisi `lib/`, `test/`, `docs/`, `screenshots/`, dan `README.md` ini.
+
+#### Hasil yang dicapai
+
+Tiga fitur (`notes`, `posts`, `settings`) kini terpisah menjadi domain, data, dan presentation dengan dependensi satu arah. Perilaku aplikasi tidak berubah (dibuktikan screenshot before/after), `flutter analyze` bersih, dan tujuh test lulus. Satu perbaikan perilaku ditemukan saat refactor: loop refresh tak berujung pada cache posts.
+
+#### Cara Menjalankan
+
+```bash
+cd 07-week-7-clean-architecture
+flutter pub get
+flutter run
+```
+
+---
+
+## Refleksi
+
+1. **Mengapa interface repository harus tinggal di domain, bukan di data? Apa yang rusak bila dibalik?**<br>
+Jawaban:<br>
+Jika interface ada di `data`, domain harus mengimpor data untuk memakai kontraknya, sehingga panah dependensi berbalik dan domain ikut terikat ke sqflite dan Dio. Akibatnya use case tidak bisa diuji tanpa database sungguhan, dan mengganti sumber data berarti mengubah domain. Dengan interface di domain, `data` yang bergantung ke domain, bukan sebaliknya, sehingga use case bisa diuji dengan repository palsu seperti `get_notes_test.dart`.
+
+2. **Kapan use case benar-benar dibutuhkan, dan kapan repository langsung ke notifier sudah cukup?**<br>
+Jawaban:<br>
+Use case dibutuhkan saat satu operasi menggabungkan beberapa langkah atau punya aturan bisnis, seperti `SyncNotes` (hitung catatan belum sinkron, lalu tandai tersinkron) dan `ToggleDarkMode` (baca, balik nilai, simpan). Untuk CRUD satu baris tanpa aturan, seperti add/delete catatan dan fitur `posts`, notifier langsung ke repository sudah cukup, karena use case hanya akan meneruskan panggilan.
+
+3. **Apa biaya over-engineering (use case per CRUD satu-baris) bagi tim kecil? Kapan biayanya sepadan?**<br>
+Jawaban:<br>
+Biayanya lebih banyak file dan lebih banyak lompatan baca untuk perubahan kecil. Di project ini, `AppSettings` untuk satu boolean menambah beberapa file tanpa menambah kemampuan. Biaya itu sepadan hanya bila pola yang seragam memang dibutuhkan, misalnya karena modul mewajibkannya atau karena fitur diperkirakan tumbuh dan butuh diuji terpisah.
+
+4. **Bagian mana dari usulan AI yang Anda tolak atau sederhanakan, dan mengapa?**<br>
+Jawaban:<br>
+Usulan AI menyebut `AppSettings` berlebihan, tetapi tetap dibuat demi pola yang seragam di fitur kedua. Usulan menghapus `markOpenedNow` dan `getLastOpened` tidak diikuti karena di luar lingkup tiga poin challenge, dan dicatat sebagai temuan. Dua hal yang tidak dibahas AI ditemukan sendiri saat memindahkan kode: loop `invalidateSelf()` pada cache posts, dan `main.dart` yang bergantung pada provider yang tertanam di file halaman.
 
 ---
