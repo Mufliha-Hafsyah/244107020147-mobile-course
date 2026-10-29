@@ -27,7 +27,7 @@ Perintah yang dijalankan: `git log --oneline -15`, `git branch -a`, `git status`
 |---|---|---|---|
 | Validasi judul kosong + test | `feature/notes-validation` | #2 (Closes #1) | `ValidationFailure`, use case `AddNote`, pesan error di dialog, `add_note_test.dart`, fake test dipusatkan di `test/fakes/` |
 | Rapikan format project | `chore/dart-format` | #3 (merged) | `dart format` pada 30 file di luar PR #2, tanpa perubahan logika |
-| Otomatisasi pemeriksaan | `feature/ci-github-actions` | (isi nomor PR) | `.github/workflows/ci.yml`: format, analyze, test pada setiap PR |
+| Otomatisasi pemeriksaan | `feature/ci-github-actions` | #4 (merged) | `.github/workflows/ci.yml`: format, analyze, test pada setiap PR |
 
 Alur setiap PR: issue, branch dari `develop`, commit kecil, PR ke `develop`, review, merge.
 
@@ -37,14 +37,14 @@ Alur setiap PR: issue, branch dari `develop`, commit kecil, PR ke `develop`, rev
 |---|---|---|
 | Struktur feature-first terbukti (tiga grep sterilitas Minggu 7) | [x] | README Week 7, Checklist poin 1 sampai 3 |
 | `flutter analyze` bersih | [x] | `No issues found!` |
-| `dart format` rapi | [x] | PR #3 dan PR #2; CI sempat menolak 3 file yang belum rapi (`screenshots/03-ci-merah-format.png`) |
-| `flutter test` hijau | [x] | 11 test lulus |
-| CI hijau di PR | [ ] | Menunggu PR #2 di-merge, lalu CI dijalankan ulang |
+| `dart format` rapi | [x] | PR #3 dan PR #2; CI sempat menolak 3 file yang belum rapi (`screenshots/03-ci-merah-format.png`), lalu diperbaiki |
+| `flutter test` hijau | [x] | 12 test lulus |
+| CI hijau di PR | [x] | PR #4 berhasil hijau (All checks have passed) setelah perbaikan format dan test |
 | Issue dan PR kecil, satu fitur | [~] | Issue #1, PR #2. Ukuran akhir +192 -116 (308 baris), melewati batas 300 sebanyak 8 baris. Lihat catatan di bawah tabel |
 | Commit konvensional | [x] | Tabel bagian 2 dan riwayat commit PR #2 |
 | Review AI terdokumentasi | [x] | [ai-review-vs-keputusan.md](ai-review-vs-keputusan.md) |
-| Review sejawat dan tindak lanjutnya | [ ] | Menunggu review PR #2 |
-| README Week 8 + screenshot + cara menjalankan | [ ] | Disusun setelah semua bukti terkumpul |
+| Review sejawat dan tindak lanjutnya | [x] | Reviewer (Febrianucup) memberikan Request Changes, semua temuan (Kebenaran, Arsitektur, Test) sudah diperbaiki. Reviewer memberikan Approve |
+| README Week 8 + screenshot + cara menjalankan | [x] | Dokumen README lengkap dengan screenshot bukti dan instruksi |
 
 
 Catatan ukuran PR #2: fitur inti (dua commit awal) berukuran +145 -25 (170 baris). Total
@@ -59,6 +59,6 @@ sebaiknya dibuat PR tersendiri sejak awal.
 | Syarat | Status |
 |---|---|
 | Aplikasi berjalan identik dengan akhir Minggu 7 | [x] (perilaku lama tidak berubah, hanya validasi judul kosong yang ditambah) |
-| Tiga pemeriksaan mesin hijau | [x] lokal, [ ] CI |
-| Minimal 1 PR kecil di-merge via review sejawat | [ ] |
-| README memuat status paruh semester dan peta issue/PR | [ ] |
+| Tiga pemeriksaan mesin hijau | [x] Lokal (analyze, format, test) & CI (GitHub Actions hijau) |
+| Minimal 1 PR kecil di-merge via review sejawat | [x] PR #2 di-approve dan di-merge ke `develop` |
+| README memuat status paruh semester dan peta issue/PR | [x] README dan checklist ini sudah dilengkapi |

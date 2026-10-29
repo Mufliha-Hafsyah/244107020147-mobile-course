@@ -64,6 +64,15 @@ Ringkasan: dari 6 temuan AI, 3 terbukti dan diterima atau ditolak dengan bukti (
 
 ## 5. Review sejawat
 
-(Diisi setelah reviewer sejawat selesai: nama reviewer, link review, keputusan Approve/Request changes,
-dan tindak lanjut saya atas komentarnya.)
+Review sejawat dilakukan oleh **Febrianucup** (Collaborator) pada tanggal 29 Oktober 2026 melalui Pull Request #2. Reviewer memberikan status **Request changes** dengan 3 temuan utama terkait Kebenaran, Arsitektur, dan Testing.
+
+Berikut adalah tindak lanjut dari temuan tersebut:
+
+| Temuan Reviewer | Tindak Lanjut | Status |
+|---|---|---|
+| **Kebenaran:** Failure selain validasi (`LocalFailure`) membuat dialog tertutup tanpa pesan. | Mengubah `addNote` agar mengembalikan `String?` (pesan error). UI diperbaiki agar jika `error != null`, dialog tetap terbuka dan menampilkan pesan. | **Selesai** |
+| **Arsitektur:** Error dilaporkan lewat dua jalur (return value & state). | Menyeragamkan kontrak `addNote` menjadi `Future<String?>`. State `AsyncError` dihapus dari alur penambahan catatan agar daftar tidak ikut error. | **Selesai** |
+| **Test:** Test untuk `NotesNotifier` dan dialog belum ada. | Menambahkan `notes_notifier_test.dart` (Unit & Widget Test). Whitespace (`\t`, `\n`) juga diparameterkan di `add_note_test.dart`. | **Selesai** |
+
+Setelah semua temuan diperbaiki, `flutter analyze` bersih dan seluruh 12 test lulus. CI GitHub Actions (PR #4) juga berhasil berjalan dengan status **hijau**. Reviewer kemudian memberikan **Approve** dan PR #2 berhasil di-*merge* ke branch `develop`.
 
