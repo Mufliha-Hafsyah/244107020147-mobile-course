@@ -19,8 +19,7 @@ class _FakeNoteRepository implements NoteRepository {
   Future<({Note? note, Failure? failure})> addNote({
     required String title,
     String body = '',
-  }) =>
-      throw UnimplementedError();
+  }) => throw UnimplementedError();
 
   @override
   Future<Failure?> deleteNote(int id) => throw UnimplementedError();
@@ -55,9 +54,9 @@ void main() {
     final container = ProviderContainer(
       overrides: [
         noteRepositoryProvider.overrideWithValue(
-          _FakeNoteRepository(items: [
-            Note(title: 'Tes', updatedAt: DateTime.now()),
-          ]),
+          _FakeNoteRepository(
+            items: [Note(title: 'Tes', updatedAt: DateTime.now())],
+          ),
         ),
       ],
     );

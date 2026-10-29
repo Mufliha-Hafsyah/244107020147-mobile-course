@@ -5,12 +5,14 @@ import '../../data/repositories/post_repository_impl.dart';
 import '../../domain/entities/post.dart';
 import '../../domain/repositories/post_repository.dart';
 
-final postRepositoryProvider =
-    Provider<PostRepository>((ref) => PostRepositoryImpl());
+final postRepositoryProvider = Provider<PostRepository>(
+  (ref) => PostRepositoryImpl(),
+);
 
 final cachedPostsProvider =
     AsyncNotifierProvider<CachedPostsNotifier, List<Post>>(
-        CachedPostsNotifier.new);
+      CachedPostsNotifier.new,
+    );
 
 class CachedPostsNotifier extends AsyncNotifier<List<Post>> {
   @override
