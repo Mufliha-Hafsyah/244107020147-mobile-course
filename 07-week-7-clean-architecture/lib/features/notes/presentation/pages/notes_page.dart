@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../providers/notes_providers.dart';
 import '../widgets/note_tile.dart';
 import '../../../../core/failures.dart';
@@ -14,26 +15,27 @@ class NotesPage extends ConsumerWidget {
     final dirtyCountAsync = ref.watch(dirtyCountProvider);
 
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Catatan'),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.settings),
-              onPressed: () => context.push('/settings'),
-            ),
-            IconButton(
-              icon: const Icon(Icons.sync),
-              onPressed: () async {
-                final result = await ref.read(syncNotesProvider).call();
-                ref.invalidate(notesProvider);
-                ref.invalidate(dirtyCountProvider);
-                if (context.mounted) {
-                  final message = result.failure?.message ??
-                      '${result.synced} catatan berhasil disinkron';
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text(message)));
-                }
-              },
+      appBar: AppBar(
+        title: const Text('Catatan'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () => context.push('/settings'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.sync),
+            onPressed: () async {
+              final result = await ref.read(syncNotesProvider).call();
+              ref.invalidate(notesProvider);
+              ref.invalidate(dirtyCountProvider);
+              if (context.mounted) {
+                final message =
+                    result.failure?.message ??
+                    '${result.synced} catatan berhasil disinkron';
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text(message)));
+              }
+            },
           ),
           dirtyCountAsync.when(
             loading: () => const SizedBox.shrink(),
