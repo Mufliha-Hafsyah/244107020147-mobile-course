@@ -74,26 +74,37 @@ class NotesPage extends ConsumerWidget {
 
   void _showAddDialog(BuildContext context, WidgetRef ref) {
     final controller = TextEditingController();
+    String? errorText;
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Catatan baru'),
-        content: TextField(controller: controller, autofocus: true),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Batal'),
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: const Text('Catatan baru'),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            decoration: InputDecoration(errorText: errorText),
           ),
-          FilledButton(
-            onPressed: () {
-              if (controller.text.trim().isNotEmpty) {
-                ref.read(notesProvider.notifier).addNote(controller.text.trim());
-              }
-              Navigator.pop(context);
-            },
-            child: const Text('Tambah'),
-          ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Batal'),
+            ),
+            FilledButton(
+              onPressed: () async {
+                final failure = await ref
+                    .read(notesProvider.notifier)
+                    .addNote(controller.text);
+                if (failure is ValidationFailure) {
+                  setState(() => errorText = failure.message);
+                  return;
+                }
+                if (dialogContext.mounted) Navigator.pop(dialogContext);
+              },
+              child: const Text('Tambah'),
+            ),
+          ],
+        ),
       ),
     );
   }
