@@ -9,16 +9,16 @@ class PostModel extends Post {
   });
 
   factory PostModel.fromJson(Map<String, dynamic> json) => PostModel(
-        id: (json['id'] as num).toInt(),
-        userId: (json['userId'] as num?)?.toInt() ?? 0,
-        title: json['title'] as String? ?? '',
-        body: json['body'] as String? ?? '',
-      );
+    id: (json['id'] as num).toInt(),
+    userId: (json['userId'] as num?)?.toInt() ?? 0,
+    title: json['title'] as String? ?? '',
+    body: json['body'] as String? ?? '',
+  );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'userId': userId,
-        'title': title,
-        'body': body,
-      };
+    'id': id,
+    'userId': userId,
+    'title': title,
+    'body': body,
+  };
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/notes_providers.dart'; 
+
+import '../providers/notes_providers.dart';
 import '../../../../core/failures.dart';
 
 class NoteDetailPage extends ConsumerWidget {
