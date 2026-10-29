@@ -40,14 +40,15 @@ class NotesNotifier extends AsyncNotifier<List<Note>> {
     return result.notes;
   }
 
-  Future<Failure?> addNote(String title) async {
+  // Ubah signature: return String? (pesan error) atau null jika sukses
+  Future<String?> addNote(String title) async {
     final result = await ref.read(addNoteProvider).call(title: title);
     final failure = result.failure;
-    if (failure is ValidationFailure) return failure;
-    if (failure != null) {
-      state = AsyncError(FailureException(failure), StackTrace.current);
-      return failure;
-    }
+    
+    // Satu jalur: semua failure dikembalikan sebagai pesan
+    if (failure != null) return failure.message;
+    
+    // Sukses: refresh daftar
     ref.invalidateSelf();
     return null;
   }

@@ -94,13 +94,16 @@ class NotesPage extends ConsumerWidget {
             ),
             FilledButton(
               onPressed: () async {
-                final failure = await ref
+                // Sekarang semua failure ditangkap di sini
+                final error = await ref
                     .read(notesProvider.notifier)
                     .addNote(controller.text);
-                if (failure is ValidationFailure) {
-                  setState(() => errorText = failure.message);
-                  return;
+                
+                if (error != null) {
+                  setState(() => errorText = error);
+                  return; // Dialog tetap terbuka
                 }
+                
                 if (dialogContext.mounted) Navigator.pop(dialogContext);
               },
               child: const Text('Tambah'),

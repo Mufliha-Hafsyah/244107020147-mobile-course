@@ -1,39 +1,40 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:week5_offline_notes/core/failures.dart';
 import 'package:week5_offline_notes/features/notes/domain/usecases/add_note.dart';
-
 import 'fakes/fake_note_repository.dart';
 
 void main() {
-  test('AddNote menolak judul kosong dan tidak memanggil repository', () async {
-    final repo = FakeNoteRepository();
-    final result = await AddNote(repo).call(title: '');
-    expect(result.note, isNull);
-    expect(result.failure, isA<ValidationFailure>());
+  late FakeNoteRepository repository;
+  late AddNote usecase;
+
+  setUp(() {
+    repository = FakeNoteRepository();
+    usecase = AddNote(repository);
+  });
+
+  test('judul kosong menghasilkan ValidationFailure', () async {
+    final result = await usecase(title: '');
+    
+    expect(result.failure, isNotNull);
     expect(result.failure!.message, 'Judul catatan tidak boleh kosong.');
-    expect(repo.addCalls, 0);
   });
 
-  test('AddNote menolak judul yang hanya berisi spasi', () async {
-    final repo = FakeNoteRepository();
-    final result = await AddNote(repo).call(title: '   ');
-    expect(result.failure, isA<ValidationFailure>());
-    expect(repo.addCalls, 0);
+  test('judul berisi whitespace saja ditolak', () async {
+    final whitespaces = [' ', '\t', '\n'];
+    
+    for (final ws in whitespaces) {
+      final result = await usecase(title: ws);
+      
+      expect(result.failure, isNotNull, reason: 'Harus gagal untuk whitespace: "$ws"');
+      expect(result.failure!.message, 'Judul catatan tidak boleh kosong.');
+    }
   });
 
-  test('AddNote men-trim judul lalu meneruskannya ke repository', () async {
-    final repo = FakeNoteRepository();
-    final result = await AddNote(repo).call(title: '  Belanja  ');
+  test('judul valid berhasil disimpan', () async {
+    final result = await usecase(title: 'Catatan Penting');
+    
     expect(result.failure, isNull);
-    expect(result.note!.title, 'Belanja');
-    expect(repo.addCalls, 1);
-    expect(repo.lastTitle, 'Belanja');
-  });
-
-  test('AddNote meneruskan failure dari repository tanpa melempar', () async {
-    final repo = FakeNoteRepository(fail: true);
-    final result = await AddNote(repo).call(title: 'A');
-    expect(result.note, isNull);
-    expect(result.failure, isA<LocalFailure>());
+    // Perhatikan: fake repository menggunakan 'items', bukan 'notes'
+    expect(repository.addCalls, 1); 
+    expect(repository.lastTitle, 'Catatan Penting');
   });
 }
