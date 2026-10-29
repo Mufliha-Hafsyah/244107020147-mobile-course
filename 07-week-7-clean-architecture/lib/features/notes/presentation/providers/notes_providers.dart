@@ -5,9 +5,9 @@ import '../../../../data/local/db.dart';
 import '../../data/repositories/note_repository_impl.dart';
 import '../../domain/entities/note.dart';
 import '../../domain/repositories/note_repository.dart';
-import '../../domain/usecases/add_note.dart';
 import '../../domain/usecases/get_notes.dart';
 import '../../domain/usecases/sync_notes.dart';
+import '../../domain/usecases/add_note.dart';
 
 // Data layer: database opener disuntikkan (mudah diganti fake saat test)
 final noteRepositoryProvider = Provider<NoteRepository>((ref) {
@@ -19,12 +19,12 @@ final getNotesProvider = Provider<GetNotes>((ref) {
   return GetNotes(ref.watch(noteRepositoryProvider));
 });
 
-final syncNotesProvider = Provider<SyncNotes>((ref) {
-  return SyncNotes(ref.watch(noteRepositoryProvider));
-});
-
 final addNoteProvider = Provider<AddNote>((ref) {
   return AddNote(ref.watch(noteRepositoryProvider));
+});
+
+final syncNotesProvider = Provider<SyncNotes>((ref) {
+  return SyncNotes(ref.watch(noteRepositoryProvider));
 });
 
 // Presentation layer: state untuk UI
@@ -40,15 +40,13 @@ class NotesNotifier extends AsyncNotifier<List<Note>> {
     return result.notes;
   }
 
-  // Ubah signature: return String? (pesan error) atau null jika sukses
+  // CRUD satu baris: langsung ke repository, tanpa use case.
   Future<String?> addNote(String title) async {
     final result = await ref.read(addNoteProvider).call(title: title);
     final failure = result.failure;
-    
-    // Satu jalur: semua failure dikembalikan sebagai pesan
+
     if (failure != null) return failure.message;
-    
-    // Sukses: refresh daftar
+
     ref.invalidateSelf();
     return null;
   }

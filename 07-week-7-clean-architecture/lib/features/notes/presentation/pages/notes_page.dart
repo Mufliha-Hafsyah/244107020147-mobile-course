@@ -85,7 +85,9 @@ class NotesPage extends ConsumerWidget {
           content: TextField(
             controller: controller,
             autofocus: true,
-            decoration: InputDecoration(errorText: errorText),
+            decoration: InputDecoration(
+              errorText: errorText,
+            ), // Menampilkan error
           ),
           actions: [
             TextButton(
@@ -94,16 +96,15 @@ class NotesPage extends ConsumerWidget {
             ),
             FilledButton(
               onPressed: () async {
-                // Sekarang semua failure ditangkap di sini
                 final error = await ref
                     .read(notesProvider.notifier)
                     .addNote(controller.text);
-                
+
                 if (error != null) {
                   setState(() => errorText = error);
-                  return; // Dialog tetap terbuka
+                  return;
                 }
-                
+
                 if (dialogContext.mounted) Navigator.pop(dialogContext);
               },
               child: const Text('Tambah'),
