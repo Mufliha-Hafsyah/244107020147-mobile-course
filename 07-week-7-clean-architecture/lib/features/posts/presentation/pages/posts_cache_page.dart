@@ -18,7 +18,8 @@ class PostsCachePage extends ConsumerWidget {
         error: (err, _) => Center(child: Text(messageFromError(err))),
         data: (posts) => posts.isEmpty
             ? const Center(
-                child: Text('Belum ada cache. Sambungkan internet dulu.'))
+                child: Text('Belum ada cache. Sambungkan internet dulu.'),
+              )
             : ListView.builder(
                 itemCount: posts.length,
                 itemBuilder: (context, index) {

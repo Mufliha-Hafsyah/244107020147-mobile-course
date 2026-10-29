@@ -1,4 +1,5 @@
 import 'package:sqflite/sqflite.dart';
+
 import '../../../../core/failures.dart';
 import '../../domain/entities/note.dart';
 import '../../domain/repositories/note_repository.dart';
@@ -34,12 +35,21 @@ class NoteRepositoryImpl implements NoteRepository {
       final now = DateTime.now();
       final id = await db.insert(
         'notes',
-        NoteModel(title: title, body: body, updatedAt: now, dirty: true)
-            .toMap(),
+        NoteModel(
+          title: title,
+          body: body,
+          updatedAt: now,
+          dirty: true,
+        ).toMap(),
       );
       return (
         note: Note(
-            id: id, title: title, body: body, updatedAt: now, dirty: true),
+          id: id,
+          title: title,
+          body: body,
+          updatedAt: now,
+          dirty: true,
+        ),
         failure: null,
       );
     } catch (e) {
@@ -65,13 +75,17 @@ class NoteRepositoryImpl implements NoteRepository {
   Future<({int count, Failure? failure})> countDirty() async {
     try {
       final db = await _openDb();
-      final rows = await db
-          .rawQuery('SELECT COUNT(*) AS c FROM notes WHERE dirty = 1');
+      final rows = await db.rawQuery(
+        'SELECT COUNT(*) AS c FROM notes WHERE dirty = 1',
+      );
       return (count: (rows.first['c'] as num?)?.toInt() ?? 0, failure: null);
     } catch (e) {
       return (
         count: 0,
-        failure: LocalFailure('Gagal menghitung catatan belum sinkron.', cause: e),
+        failure: LocalFailure(
+          'Gagal menghitung catatan belum sinkron.',
+          cause: e,
+        ),
       );
     }
   }

@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
+
 import '../../domain/entities/note.dart';
 
 class NoteTile extends StatelessWidget {
-  const NoteTile({
-    super.key,
-    required this.note,
-    this.onDelete,
-    this.onTap,
-  });
+  const NoteTile({super.key, required this.note, this.onDelete, this.onTap});
 
   final Note note;
   final VoidCallback? onDelete;
@@ -20,10 +16,7 @@ class NoteTile extends StatelessWidget {
       title: Text(note.title),
       subtitle: note.dirty ? const Text('Belum tersinkron') : null,
       trailing: onDelete != null
-          ? IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: onDelete,
-            )
+          ? IconButton(icon: const Icon(Icons.delete), onPressed: onDelete)
           : null,
     );
   }

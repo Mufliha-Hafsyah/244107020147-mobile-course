@@ -11,9 +11,10 @@ import '../models/post_model.dart';
 
 class PostRepositoryImpl implements PostRepository {
   PostRepositoryImpl({Future<Database> Function()? openDb, Dio? dio})
-      : _openDb = openDb ?? openNotesDb,
-        _dio = dio ??
-            Dio(BaseOptions(baseUrl: 'https://jsonplaceholder.typicode.com'));
+    : _openDb = openDb ?? openNotesDb,
+      _dio =
+          dio ??
+          Dio(BaseOptions(baseUrl: 'https://jsonplaceholder.typicode.com'));
 
   final Future<Database> Function() _openDb;
   final Dio _dio;
@@ -24,8 +25,11 @@ class PostRepositoryImpl implements PostRepository {
       final db = await _openDb();
       final rows = await db.query('cached_posts', orderBy: 'id ASC');
       final posts = rows
-          .map((row) => PostModel.fromJson(
-              jsonDecode(row['payload'] as String) as Map<String, dynamic>))
+          .map(
+            (row) => PostModel.fromJson(
+              jsonDecode(row['payload'] as String) as Map<String, dynamic>,
+            ),
+          )
           .toList();
       return (posts: posts, failure: null);
     } catch (e) {

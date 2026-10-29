@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+
 import 'features/notes/presentation/pages/notes_page.dart';
 import 'features/notes/presentation/pages/note_detail_page.dart';
 import 'features/posts/presentation/pages/posts_cache_page.dart';
@@ -13,7 +14,10 @@ final router = GoRouter(
       builder: (context, state, child) => MainShell(child: child),
       routes: [
         GoRoute(path: '/', builder: (context, state) => const NotesPage()),
-        GoRoute(path: '/posts', builder: (context, state) => const PostsCachePage()),
+        GoRoute(
+          path: '/posts',
+          builder: (context, state) => const PostsCachePage(),
+        ),
       ],
     ),
     GoRoute(

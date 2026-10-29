@@ -16,8 +16,9 @@ final toggleDarkModeProvider = Provider<ToggleDarkMode>(
 
 // Nama provider sengaja sama dengan versi lama supaya pemakainya
 // (misalnya tema di main.dart) cukup mengganti import.
-final darkModeProvider =
-    AsyncNotifierProvider<DarkModeNotifier, bool>(DarkModeNotifier.new);
+final darkModeProvider = AsyncNotifierProvider<DarkModeNotifier, bool>(
+  DarkModeNotifier.new,
+);
 
 class DarkModeNotifier extends AsyncNotifier<bool> {
   @override
