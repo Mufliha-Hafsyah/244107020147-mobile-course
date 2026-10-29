@@ -44,9 +44,9 @@ class NotesNotifier extends AsyncNotifier<List<Note>> {
   Future<String?> addNote(String title) async {
     final result = await ref.read(addNoteProvider).call(title: title);
     final failure = result.failure;
-    
+
     if (failure != null) return failure.message;
-    
+
     ref.invalidateSelf();
     return null;
   }
