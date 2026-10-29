@@ -1,9 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../../core/failures.dart';
 import '../../../../data/local/db.dart';
 import '../../data/repositories/note_repository_impl.dart';
 import '../../domain/entities/note.dart';
 import '../../domain/repositories/note_repository.dart';
+import '../../domain/usecases/add_note.dart';
 import '../../domain/usecases/get_notes.dart';
 import '../../domain/usecases/sync_notes.dart';
 
@@ -21,9 +23,14 @@ final syncNotesProvider = Provider<SyncNotes>((ref) {
   return SyncNotes(ref.watch(noteRepositoryProvider));
 });
 
+final addNoteProvider = Provider<AddNote>((ref) {
+  return AddNote(ref.watch(noteRepositoryProvider));
+});
+
 // Presentation layer: state untuk UI
-final notesProvider =
-    AsyncNotifierProvider<NotesNotifier, List<Note>>(NotesNotifier.new);
+final notesProvider = AsyncNotifierProvider<NotesNotifier, List<Note>>(
+  NotesNotifier.new,
+);
 
 class NotesNotifier extends AsyncNotifier<List<Note>> {
   @override
@@ -33,16 +40,17 @@ class NotesNotifier extends AsyncNotifier<List<Note>> {
     return result.notes;
   }
 
-  // CRUD satu baris: langsung ke repository, tanpa use case.
-  Future<void> addNote(String title) async {
-    final result =
-        await ref.read(noteRepositoryProvider).addNote(title: title);
-    if (result.failure != null) {
-      state = AsyncError(
-          FailureException(result.failure!), StackTrace.current);
-      return;
-    }
+  // Ubah signature: return String? (pesan error) atau null jika sukses
+  Future<String?> addNote(String title) async {
+    final result = await ref.read(addNoteProvider).call(title: title);
+    final failure = result.failure;
+    
+    // Satu jalur: semua failure dikembalikan sebagai pesan
+    if (failure != null) return failure.message;
+    
+    // Sukses: refresh daftar
     ref.invalidateSelf();
+    return null;
   }
 
   Future<void> deleteNote(int id) async {
