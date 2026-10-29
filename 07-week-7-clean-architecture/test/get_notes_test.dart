@@ -1,46 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:week5_offline_notes/core/failures.dart';
 import 'package:week5_offline_notes/features/notes/domain/entities/note.dart';
-import 'package:week5_offline_notes/features/notes/domain/repositories/note_repository.dart';
 import 'package:week5_offline_notes/features/notes/domain/usecases/get_notes.dart';
 
-class FakeNoteRepository implements NoteRepository {
-  FakeNoteRepository({this.items = const [], this.fail = false});
-
-  final List<Note> items;
-  final bool fail;
-
-  @override
-  Future<({List<Note> notes, Failure? failure})> fetchNotes() async {
-    if (fail) {
-      return (
-        notes: const <Note>[],
-        failure: const LocalFailure('db locked (simulasi)'),
-      );
-    }
-    return (notes: items, failure: null);
-  }
-
-  @override
-  Future<({Note? note, Failure? failure})> addNote({
-    required String title,
-    String body = '',
-  }) {
-    throw UnimplementedError();
-  }
-
-  // Tiga method di bawah tidak ada di fake pada modul. Ditambahkan karena
-  // interface repository proyek ini lebih lebar dari contoh modul.
-  @override
-  Future<Failure?> deleteNote(int id) => throw UnimplementedError();
-
-  @override
-  Future<({int count, Failure? failure})> countDirty() =>
-      throw UnimplementedError();
-
-  @override
-  Future<Failure?> markAllSynced() => throw UnimplementedError();
-}
+import 'fakes/fake_note_repository.dart';
 
 void main() {
   test('GetNotes meneruskan daftar dari repository', () async {
