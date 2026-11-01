@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../../core/failures.dart';
 import '../../../../data/local/db.dart';
 import '../../data/repositories/note_repository_impl.dart';
@@ -23,8 +24,9 @@ final syncNotesProvider = Provider<SyncNotes>((ref) {
 });
 
 // Presentation layer: state untuk UI
-final notesProvider =
-    AsyncNotifierProvider<NotesNotifier, List<Note>>(NotesNotifier.new);
+final notesProvider = AsyncNotifierProvider<NotesNotifier, List<Note>>(
+  NotesNotifier.new,
+);
 
 class NotesNotifier extends AsyncNotifier<List<Note>> {
   @override
@@ -36,11 +38,9 @@ class NotesNotifier extends AsyncNotifier<List<Note>> {
 
   // CRUD satu baris: langsung ke repository, tanpa use case.
   Future<void> addNote(String title) async {
-    final result =
-        await ref.read(noteRepositoryProvider).addNote(title: title);
+    final result = await ref.read(noteRepositoryProvider).addNote(title: title);
     if (result.failure != null) {
-      state = AsyncError(
-          FailureException(result.failure!), StackTrace.current);
+      state = AsyncError(FailureException(result.failure!), StackTrace.current);
       return;
     }
     ref.invalidateSelf();
@@ -72,8 +72,9 @@ class NotesQueryNotifier extends Notifier<String> {
   void set(String value) => state = value;
 }
 
-final notesQueryProvider =
-    NotifierProvider<NotesQueryNotifier, String>(NotesQueryNotifier.new);
+final notesQueryProvider = NotifierProvider<NotesQueryNotifier, String>(
+  NotesQueryNotifier.new,
+);
 
 final filteredNotesProvider = Provider<AsyncValue<List<Note>>>((ref) {
   final query = ref.watch(notesQueryProvider);
