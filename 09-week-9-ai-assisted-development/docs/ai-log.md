@@ -223,12 +223,28 @@ void main() {
 
 ## 4. Verifikasi
 
-(Diisi setelah kode dibaca, dicek, dan diuji.)
+Saya tidak menerima output AI secara mentah. Tiga hal yang saya periksa dan ubah:
+
+1. **Nama package di test:** AI memakai placeholder `package:<nama_package>`. Saya menggantinya dengan `package:week5_offline_notes` sesuai `name:` di `pubspec.yaml`.
+2. **Constructor `Note` di test:** AI hanya menulis `Note(title: ..., updatedAt: ...)`. Saya cek file `note.dart` dan memastikan field `id` diisi untuk membedakan hasil filter di test.
+3. **Integrasi ke `notes_page.dart`:** AI hanya memberi saran "taruh NotesSearchField di atas daftar". Saya sendiri yang membuka `notes_page.dart`, membungkus body dengan `Column` + `Expanded`, dan menambahkan import `notes_result_list.dart`. Setelah itu ada error `unused_import` untuk `failures.dart` yang saya hapus secara manual.
 
 ## 5. Tabel terima / tolak
 
-(Diisi setelah verifikasi.)
+| Usulan AI | Keputusan | Alasan |
+|---|---|---|
+| `SearchNotes` di domain, murni tanpa import framework | **Terima** | Sesuai dependency rule Clean Architecture, logika filter tidak butuh SQLite/Flutter |
+| `filteredNotesProvider` membaca `notesProvider` dan memfilter via use case | **Terima** | Pemisahan tanggung jawab rapi: UI tidak tahu cara memfilter, cukup *watch* state |
+| Widget `NotesSearchField` & `NotesResultList` terpisah | **Terima** | Memudahkan testing (bisa di-pump sendiri) dan menjaga `notes_page.dart` tetap ringkas |
+| `NotesResultList` menerima `itemBuilder` opsional | **Terima** | Fleksibel: halaman bisa menyuntikkan `NoteTile` yang sudah ada, termasuk `onTap`/`onDelete` |
+| Unit test `search_notes_test.dart` | **Terima, disesuaikan** | Placeholder `nama_package` diganti, konstruktor `Note` disesuaikan dengan field wajib `updatedAt` |
+| Widget test `notes_empty_state_test.dart` | **Tolak untuk saat ini** | Widget test butuh *override* `notesProvider` yang cukup rumit; untuk Week 9 fokus ke unit test use case murni. Empty state diverifikasi lewat uji manual. |
+| [Review AI] Gunakan `TextEditingController` lokal di search field | **Tolak** | Menambah *boilerplate* (lifecycle dispose). `ref.read` di `onChanged` sudah cukup untuk filter *real-time* |
+| [Review AI] Ganti teks statis error di `NotesResultList` dengan `messageFromError` | **Terima** | Selaras dengan arsitektur Week 7. Error handling harus mem-parsing `Failure` agar pesan informatif |
+| [Review AI] Cari juga di `body` (isi catatan), bukan hanya judul | **Tolak** | *Out of scope*. Prompt dan jobsheet secara eksplisit hanya meminta pencarian judul |
 
-## 6. Bukti mesin hijau
+## 6. Bukti Pengujian Lulus (Analyze & Test)
 
-(Diisi setelah `flutter analyze` dan `flutter test`.)
+![Analyze dan Test Hijau](screenshots/flutter-analyze-test.png)<br>
+
+*(Keterangan: +11 test ini mencakup 7 test bawaan Week 7 dan 4 test baru dari `search_notes_test.dart` untuk use case `SearchNotes`).*
