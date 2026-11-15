@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1001100326111",
+    "project_id": "campus-notify-mufliha",
+    "storage_bucket": "campus-notify-mufliha.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1001100326111:android:3c9e9f37f4a53e9df5e56a",
+        "android_client_info": {
+          "package_name": "com.example.campus_notify"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAyGXjA7P1817lT3dz8GR5pVSQqSjeIaX8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
