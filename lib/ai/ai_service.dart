@@ -8,6 +8,14 @@ class AiService {
   final _apiUrl =
       'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent';
 
+  final Future<String> Function(String prompt)? _fakeAsk;
+
+  AiService({this._fakeAsk});
+
+  bool isValidPrompt(String prompt) {
+    return prompt.trim().isNotEmpty;
+  }
+
   Future<String> _sendRequest(List<Map<String, dynamic>> parts) async {
     final apiKey = await _storage.read(key: 'ai_api_key');
     if (apiKey == null || apiKey.isEmpty) {
@@ -32,14 +40,15 @@ class AiService {
     }
   }
 
-  // Fungsi untuk Chat biasa (Teks)
   Future<String> ask(String question) async {
+    if (_fakeAsk != null) {
+      return _fakeAsk(question);
+    }
     return _sendRequest([
       {'text': question},
     ]);
   }
 
-  // Fungsi baru untuk OCR (Gambar)
   Future<String> askWithImage(String base64Image, String prompt) async {
     return _sendRequest([
       {
