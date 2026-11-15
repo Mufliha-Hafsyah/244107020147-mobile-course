@@ -1,4 +1,4 @@
-# 244107020147 - Mobile Course Portfolio
+# LAPORAN PRAKTIKUM - WEEK 12 PENGUJIAN DAN JAMINAN KUALITAS
 
 ## Identitas Mahasiswa
 
@@ -7,33 +7,60 @@
 | Nama | Mufliha Hafsyah Shahieza |
 | NIM | 244107020147 |
 | Kelas | TI-3G |
-| Mata Kuliah | Pemrograman Mobile | 
- 
-Repository ini digunakan untuk mendokumentasikan progres pembelajaran mata kuliah Pemrograman Mobile selama satu semester.
 
-## Struktur Repository
+---
 
-| Week | Topik | 
-|---|---|
-| 01 | [Mobile Development Ecosystem & Flutter Refresh](01-week-1-mobile-development-ecosystem-flutter-refresh/) | 
-| 02 | [Declarative UI & Responsive Design](02-week-2-declarative-ui-responsive-design/) |
-| 03 | [Navigation & State Management](03-week-3-navigation-state-management/) |
-| 04 | [Networking & REST API](04-week-4-networking-rest-api/) | 
-| 05 | [Local Storage & Offline First](05-week-5-local-storage-offline-first/) | 
-| 06 | [Authentication, Security & FCM](06-week-6-authentication-security-fcm/) | 
-| 07 | [Clean Architecture](07-week-7-clean-architecture/) | 
-| 08 | [Mid Project Review & Code Review](08-week-8-mid-project-review/) | 
-| 09 | [AI-assisted Development](09-week-9-ai-assisted-development/) | 
-| 10 | [AI Feature Integration](10-week-10-ai-feature-integration/) | 
-| 11 | [Performance Optimization](11-week-11-performance-optimization/) | 
-| 12 | [Testing & Quality Assurance](12-week-12-testing-quality-assurance/) | 
-| 13 | [CI/CD & Automation](13-week-13-ci-cd-automation/) | 
-| 14 | [Deployment & Monitoring](14-week-14-deployment-monitoring/) | 
-| 15 | [Secure Mobile Development](15-week-15-secure-mobile-development/) | 
-| 16 | [Final Project Expo](16-week-16-final-project-expo/) | 
+## Deskripsi Project
+Project ini adalah kelanjutan dari Week 11 (Optimasi Performa). Pada Week 12, fokus pekerjaan adalah **Pengujian dan Jaminan Kualitas (QA)**. Prosesnya meliputi pembuatan *Unit Test* (logika), *Dependency Test* (fake repository), *Widget Test* (UI), dan *Integration Test* (alur aplikasi di perangkat fisik).
 
-## Tech Stack
+**Stack:** Flutter, Riverpod, GoRouter, `flutter_test`, `integration_test`.
 
-- Flutter & Dart
-- Riverpod (state management)
-- Git & GitHub
+---
+
+### Ringkasan Pengujian
+
+Menerapkan strategi pengujian berlapis untuk memastikan fitur AI Chat dan validasi input berjalan dengan benar.
+
+#### 1. Unit Test & Uji Logika (Validasi Input)
+- **File:** `test/ai_service_test.dart`
+- **Skenario:** Menguji fungsi `isValidPrompt` pada `AiService` untuk menolak input kosong.
+- **Bukti:**<br>![Test Unit](screenshots/test-unit.png)
+
+#### 2. Uji Dependensi (Fake Repository)
+- **Skenario:** Mensimulasikan respons API Gemini tanpa memanggil jaringan sungguhan (fake sukses & error).
+- **Bukti:**<br>![Test Fake Repo](screenshots/test-fake-repo.png)
+
+#### 3. Widget Test (UI)
+- **File:** `test/chat_widget_test.dart`
+- **Skenario:** Memastikan elemen UI pada `ChatScreen` muncul dan berfungsi (input teks & tombol kirim).
+- **Bukti:**<br>![Test Widget](screenshots/test-widget.png)
+
+#### 4. Integration Test
+- **File:** `integration_test/app_test.dart`
+- **Skenario:** Menjalankan aplikasi utama (`main()`) pada perangkat Android fisik (ID: `RR8R70086KK`) dan memastikan aplikasi berhasil dimuat tanpa crash.
+- **Bukti:**<br>![Test Integrasi](screenshots/test-integration.png)
+
+---
+
+### Hasil Pemeriksaan
+- **`flutter analyze`:** No issues found! (Bersih).
+- **`flutter test --coverage`:** All tests passed! (Laporan cakupan tersimpan di `coverage/lcov.info`).
+
+**Bukti Analyze & Coverage:**<br>
+![Analyze & Coverage](screenshots/analyze-coverage.png)
+
+---
+
+## Refleksi
+
+1. **Bug apa yang paling mungkin terlewat tanpa pengujian yang Anda tulis?**<br>
+Jawaban:<br>
+Bug yang paling mungkin terlewat adalah **input kosong atau spasi pada prompt AI**. Tanpa unit test, pengguna bisa saja mengirim prompt kosong yang membuat API Gemini error. Selain itu, *widget test* membantu mendeteksi jika suatu saat ada perubahan UI yang membuat tombol kirim hilang atau tidak berfungsi.
+
+2. **Bagian mana yang perlu fake, dan bagaimana fake itu membuat pengujian lebih konsisten?**<br>
+Jawaban:<br>
+Bagian yang perlu fake adalah **akses ke API Gemini** (`AiService`). Pemanggilan API sungguhan dalam pengujian akan lambat, mahal, dan tidak konsisten. Dengan adanya fake, respons sukses maupun error dapat disimulasikan secara instan dan berulang, sehingga pengujian menjadi lebih cepat dan stabil.
+
+3. **Apa perbedaan nilai yang diberikan pengujian widget dan pengujian integrasi pada fitur Anda?**<br>
+Jawaban:<br>
+**Widget test** sangat cepat dan berfokus pada *satu komponen* UI (memastikan tombol kirim bisa diklik dan teks muncul). **Integration test** jauh lebih lambat karena menjalankan seluruh aplikasi pada perangkat nyata, tetapi nilainya adalah memastikan *alur utuh* (dari `main()` hingga layar chat tampil) berjalan tanpa crash.
