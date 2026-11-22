@@ -17,6 +17,9 @@ concurrency:
 jobs:
   test-and-build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 13-week-13-ci-cd-automation
     steps:
       - uses: actions/checkout@v4
       
