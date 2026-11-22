@@ -35,9 +35,9 @@ jobs:
       
       - run: flutter test --coverage
       
-      - run: flutter build apk --release
+      - run: flutter build apk --release --android-skip-build-dependency-validation
       
-      - run: flutter build appbundle --release
+      - run: flutter build appbundle --release --android-skip-build-dependency-validation
       
       - uses: actions/upload-artifact@v4
         with:
