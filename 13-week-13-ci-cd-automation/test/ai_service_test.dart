@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:week5_offline_notes/ai/ai_service.dart'; 
+import 'package:week5_offline_notes/ai/ai_service.dart';
 
 void main() {
   group('Pengujian Validasi Prompt AI', () {
@@ -34,10 +34,7 @@ void main() {
       final fakeAiService = AiService(
         fakeAsk: (prompt) async => throw Exception('Koneksi Terputus'),
       );
-      expect(
-        () => fakeAiService.ask('Halo'),
-        throwsA(isA<Exception>()),
-      );
+      expect(() => fakeAiService.ask('Halo'), throwsA(isA<Exception>()));
     });
   });
 }

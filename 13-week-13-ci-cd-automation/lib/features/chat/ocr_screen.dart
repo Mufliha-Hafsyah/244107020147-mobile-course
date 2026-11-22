@@ -71,13 +71,13 @@ class _OcrScreenState extends State<OcrScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-          if (_image != null)
-            Image.file(
-              _image!,
-              height: 200,
-              cacheWidth: 800,
-              filterQuality: FilterQuality.medium,
-            ),
+            if (_image != null)
+              Image.file(
+                _image!,
+                height: 200,
+                cacheWidth: 800,
+                filterQuality: FilterQuality.medium,
+              ),
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,

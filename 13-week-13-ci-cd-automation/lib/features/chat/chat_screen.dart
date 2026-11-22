@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+
 import '../../ai/ai_service.dart';
+
 import 'package:go_router/go_router.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -68,9 +70,7 @@ class _ChatScreenState extends State<ChatScreen> {
               itemBuilder: (context, index) {
                 // Jika ini adalah indikator loading
                 if (index == _messages.length && _isLoading) {
-                  return const RepaintBoundary(
-                    child: _TypingIndicator(),
-                  );
+                  return const RepaintBoundary(child: _TypingIndicator());
                 }
 
                 final msg = _messages[index];
